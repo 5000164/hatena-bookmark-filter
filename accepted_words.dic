@@ -2,3 +2,5 @@ hatena
 Xlint
 softwaremill
 sttp
+scalatest
+scalactic
