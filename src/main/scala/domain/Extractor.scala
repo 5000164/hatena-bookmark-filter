@@ -12,9 +12,6 @@ object Extractor {
     */
   def extractUrl(raw: String): Either[Unit, String] = {
     val r = """.*rdf:resource="(.*?)".*""".r
-    r.findFirstMatchIn(raw) match {
-      case Some(matches) => Right(matches.group(1))
-      case None => Left(())
-    }
+    r.findFirstMatchIn(raw).map(_.group(1)).toRight(())
   }
 }
