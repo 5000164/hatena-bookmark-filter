@@ -1,5 +1,8 @@
 package interfaces
 
+import infrastructure.Settings.settings
+
 object Application extends App {
-  println("hello")
+  val feedUrlList = Feeder.fetchUrlList(settings.feedUrl, settings.threshold)
+  feedUrlList.foreach(println)
 }
