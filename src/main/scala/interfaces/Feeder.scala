@@ -14,9 +14,9 @@ object Feeder {
     *
     * @return 条件を満たした URL の一覧
     */
-  def fetchUrlList(): Seq[String] = {
-    val deliveredUrlList = fetchDeliveredUrlList()
-    filter(deliveredUrlList, 10)
+  def fetchUrlList(feedUrl: String, threshold: Int): Seq[String] = {
+    val deliveredUrlList = fetchDeliveredUrlList(feedUrl)
+    filter(deliveredUrlList, threshold)
   }
 
   /**
@@ -24,8 +24,8 @@ object Feeder {
     *
     * @return 配信された URL の一覧
     */
-  def fetchDeliveredUrlList(): Seq[String] = {
-    val request = sttp.get(uri"http://b.hatena.ne.jp/hotentry/all.rss")
+  def fetchDeliveredUrlList(feedUrl: String): Seq[String] = {
+    val request = sttp.get(uri"$feedUrl")
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
     val xmlString = response.body.getOrElse("")
