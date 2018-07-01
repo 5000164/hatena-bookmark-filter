@@ -45,7 +45,9 @@ object Feeder {
     * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
     * @return 絞り込んだ後の URL の一覧
     */
-  private def filter(pageList: Seq[DeliveredPage], threshold: Int, lastExecutedAt: Option[Date]): Seq[Page] =
+  private def filter(pageList: Seq[DeliveredPage], threshold: Int, lastExecutedAt: Option[Date]): Seq[Page] = {
+    val sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
     pageList.map(page => {
       val starCount = fetchStarCount(page.url)
       Page(page.url, page.date, starCount)
@@ -54,13 +56,12 @@ object Feeder {
     }).filter(page => {
       lastExecutedAt match {
         case Some(pointDate) =>
-          val sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-          sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
           val pageDate = sdf.parse(page.date)
           pageDate.after(pointDate)
         case None => true
       }
     })
+  }
 
   /**
     * 対象の URL のはてなブックマーク件数を取得する。
