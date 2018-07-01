@@ -3,8 +3,6 @@ package interfaces
 import com.softwaremill.sttp._
 import domain.Extractor.extractUrl
 
-import scala.xml.XML
-
 /**
   * RSS に関する処理を行う
   */
@@ -29,8 +27,7 @@ object Feeder {
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
     val xmlString = response.body.getOrElse("")
-    val xml = XML.loadString(xmlString)
-    (xml \ "channel" \ "items" \ "Seq" \ "li").map(_.toString).map(extractUrl).collect { case Right(r) => r }
+    extractUrl(xmlString)
   }
 
   /**
