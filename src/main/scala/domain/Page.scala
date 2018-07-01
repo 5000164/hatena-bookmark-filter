@@ -3,7 +3,8 @@ package domain
 case class Page(
     url: String,
     date: String,
-    hatenaBookmarkCount: Int)
+    hatenaBookmarkCount: Int,
+    commentUrl: String)
 
 case class DeliveredPage(
     url: String,

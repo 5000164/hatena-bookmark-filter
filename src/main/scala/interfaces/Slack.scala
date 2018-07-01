@@ -25,7 +25,7 @@ object Slack {
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val client = BlockingSlackApiClient(token)
     pageList.foreach(page => {
-      val message = s"はてなブックマーク数: ${page.hatenaBookmarkCount}\n${page.url}"
+      val message = s"はてなブックマーク数: ${page.hatenaBookmarkCount}\n${page.url}\n${page.commentUrl}"
       client.postChatMessage(
         channelId = postChannelId,
         text = message,

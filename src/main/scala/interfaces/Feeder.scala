@@ -50,7 +50,8 @@ object Feeder {
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
     pageList.map(page => {
       val starCount = fetchStarCount(page.url)
-      Page(page.url, page.date, starCount)
+      val commentUrl = buildCommentUrl(page.url)
+      Page(page.url, page.date, starCount, commentUrl)
     }).filter(page => {
       page.hatenaBookmarkCount > threshold && (lastExecutedAt match {
         case Some(pointDate) =>
@@ -72,5 +73,17 @@ object Feeder {
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
     response.body.getOrElse("0").toInt
+  }
+
+  /**
+    * はてなブックマークコメントページの URL を構築する
+    *
+    * @param url この URL へのコメントページの URL を構築する
+    * @return はてなブックマークコメントページの URL
+    */
+  private def buildCommentUrl(url: String): String = {
+    val connector = if (url(4) == 's') {"s/"} else {""}
+    val path = url.split(':')(1).drop(2)
+    s"http://b.hatena.ne.jp/entry/$connector$path"
   }
 }
