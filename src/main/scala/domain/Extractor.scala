@@ -7,12 +7,12 @@ import scala.xml.{Elem, Node, NodeSeq, XML}
   */
 object Extractor {
   /**
-    * ページを抽出する。
+    * ページ一覧を抽出する。
     *
     * @param xmlString 抽出対象の XML 形式の文字列
     * @return 抽出結果
     */
-  def extractPage(xmlString: String): Seq[Page] = {
+  def extractPage(xmlString: String): Seq[DeliveredPage] = {
     val xml = XML.loadString(xmlString)
     getItems(xml).map(getPage)
   }
@@ -26,14 +26,14 @@ object Extractor {
   private def getItems(element: Elem): NodeSeq = element \ "item"
 
   /**
-    * URL を抽出する。
+    * ページを抽出する。
     *
     * @param node 抽出対象のノード
     * @return 抽出したページ
     */
-  private def getPage(node: Node): Page = {
+  private def getPage(node: Node): DeliveredPage = {
     val url = (node \ "link").text
     val date = (node \ "date").text
-    Page(url, date)
+    DeliveredPage(url, date)
   }
 }
