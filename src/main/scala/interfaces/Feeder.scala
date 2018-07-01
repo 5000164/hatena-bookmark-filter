@@ -52,14 +52,12 @@ object Feeder {
       val starCount = fetchStarCount(page.url)
       Page(page.url, page.date, starCount)
     }).filter(page => {
-      page.hatenaBookmarkCount > threshold
-    }).filter(page => {
-      lastExecutedAt match {
+      page.hatenaBookmarkCount > threshold && (lastExecutedAt match {
         case Some(pointDate) =>
           val pageDate = sdf.parse(page.date)
           pageDate.after(pointDate)
         case None => true
-      }
+      })
     })
   }
 
