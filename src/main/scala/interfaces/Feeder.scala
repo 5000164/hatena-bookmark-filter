@@ -8,11 +8,11 @@ import domain.Extractor.extractPage
 import domain.Page
 
 /**
-  * RSS に関する処理を行う
+  * RSS に関する処理を行う。
   */
 object Feeder {
   /**
-    * 条件を満たした URL の一覧を取得する
+    * 条件を満たした URL の一覧を取得する。
     *
     * @param feedUrl        ページを取得する元の RSS の URL
     * @param threshold      しきい値とするはてなブックマークの件数
@@ -25,7 +25,7 @@ object Feeder {
   }
 
   /**
-    * 配信されたページの一覧を取得する
+    * 配信されたページの一覧を取得する。
     *
     * @return 配信されたページの一覧
     */
@@ -38,7 +38,7 @@ object Feeder {
   }
 
   /**
-    * 条件を元に絞り込む
+    * 条件を元に絞り込む。
     *
     * @param pageList       調査する対象のページ一覧
     * @param threshold      しきい値とするはてなブックマーク件数
@@ -61,7 +61,7 @@ object Feeder {
     }).map(_.url)
 
   /**
-    * 対象の URL のはてなブックマーク件数を取得する
+    * 対象の URL のはてなブックマーク件数を取得する。
     *
     * @param url 調査する対象の URL
     * @return 対象の URL のはてなブックマーク件数
