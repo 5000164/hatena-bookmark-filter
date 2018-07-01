@@ -3,11 +3,11 @@ package domain
 import scala.xml.{Elem, Node, NodeSeq, XML}
 
 /**
-  * 抽出する処理を行う
+  * 抽出する処理を行う。
   */
 object Extractor {
   /**
-    * ページを抽出する
+    * ページを抽出する。
     *
     * @param xmlString 抽出対象の XML 形式の文字列
     * @return 抽出結果
@@ -18,7 +18,7 @@ object Extractor {
   }
 
   /**
-    * 処理対象の一覧を取得する
+    * 処理対象の一覧を取得する。
     *
     * @param element 抽出対象の XML
     * @return 処理対象の一覧
@@ -26,7 +26,7 @@ object Extractor {
   private def getItems(element: Elem): NodeSeq = element \ "item"
 
   /**
-    * URL を抽出する
+    * URL を抽出する。
     *
     * @param node 抽出対象のノード
     * @return 抽出したページ
