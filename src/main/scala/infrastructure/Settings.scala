@@ -10,10 +10,16 @@ object Settings {
 }
 
 trait SettingsType {
-  val feedUrl: String
-  val threshold: Int
+  val watches: Seq[WatchSettings]
   val slackToken: String
-  val slackPostChannelId: String
-  val slackUserName: String
-  val slackIconEmoji: String
 }
+
+case class WatchSettings(
+    feedUrl: String,
+    threshold: Int,
+    slack: SlackSettings)
+
+case class SlackSettings(
+    postChannelId: String,
+    userName: String,
+    iconEmoji: String)
