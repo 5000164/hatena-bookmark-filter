@@ -1,7 +1,8 @@
 package interfaces
 
 import com.softwaremill.sttp._
-import domain.Extractor.extractUrl
+import domain.Extractor.extractPage
+import domain.Page
 
 /**
   * RSS に関する処理を行う
@@ -13,35 +14,35 @@ object Feeder {
     * @return 条件を満たした URL の一覧
     */
   def fetchUrlList(feedUrl: String, threshold: Int): Seq[String] = {
-    val deliveredUrlList = fetchDeliveredUrlList(feedUrl)
-    filter(deliveredUrlList, threshold)
+    val deliveredPageList = fetchDeliveredPageList(feedUrl)
+    filter(deliveredPageList, threshold)
   }
 
   /**
-    * 配信された URL の一覧を取得する
+    * 配信されたページの一覧を取得する
     *
-    * @return 配信された URL の一覧
+    * @return 配信されたページの一覧
     */
-  def fetchDeliveredUrlList(feedUrl: String): Seq[String] = {
+  def fetchDeliveredPageList(feedUrl: String): Seq[Page] = {
     val request = sttp.get(uri"$feedUrl")
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
     val xmlString = response.body.getOrElse("")
-    extractUrl(xmlString)
+    extractPage(xmlString)
   }
 
   /**
     * 条件を元に絞り込む
     *
-    * @param urlList   調査する対象の URL の一覧
+    * @param pageList  調査する対象のページ一覧
     * @param threshold しきい値とするはてなブックマーク件数
     * @return 絞り込んだ後の URL の一覧
     */
-  def filter(urlList: Seq[String], threshold: Int): Seq[String] = {
-    urlList.filter(url => {
-      val starCount = fetchStarCount(url)
+  def filter(pageList: Seq[Page], threshold: Int): Seq[String] = {
+    pageList.filter(page => {
+      val starCount = fetchStarCount(page.url)
       starCount > threshold
-    })
+    }).map(_.url)
   }
 
   /**
