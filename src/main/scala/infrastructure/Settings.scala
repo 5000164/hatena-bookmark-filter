@@ -12,4 +12,8 @@ object Settings {
 trait SettingsType {
   val feedUrl: String
   val threshold: Int
+  val slackToken: String
+  val slackPostChannelId: String
+  val slackUserName: String
+  val slackIconEmoji: String
 }
