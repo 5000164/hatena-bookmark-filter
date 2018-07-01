@@ -1,5 +1,8 @@
 package interfaces
 
+import java.text.SimpleDateFormat
+import java.util.{Date, TimeZone}
+
 import com.softwaremill.sttp._
 import domain.Extractor.extractPage
 import domain.Page
@@ -11,11 +14,14 @@ object Feeder {
   /**
     * 条件を満たした URL の一覧を取得する
     *
+    * @param feedUrl        ページを取得する元の RSS の URL
+    * @param threshold      しきい値とするはてなブックマークの件数
+    * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
     * @return 条件を満たした URL の一覧
     */
-  def fetchUrlList(feedUrl: String, threshold: Int): Seq[String] = {
+  def fetchUrlList(feedUrl: String, threshold: Int, lastExecutedAt: Option[Date]): Seq[String] = {
     val deliveredPageList = fetchDeliveredPageList(feedUrl)
-    filter(deliveredPageList, threshold)
+    filter(deliveredPageList, threshold, lastExecutedAt)
   }
 
   /**
@@ -34,16 +40,25 @@ object Feeder {
   /**
     * 条件を元に絞り込む
     *
-    * @param pageList  調査する対象のページ一覧
-    * @param threshold しきい値とするはてなブックマーク件数
+    * @param pageList       調査する対象のページ一覧
+    * @param threshold      しきい値とするはてなブックマーク件数
+    * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
     * @return 絞り込んだ後の URL の一覧
     */
-  def filter(pageList: Seq[Page], threshold: Int): Seq[String] = {
+  def filter(pageList: Seq[Page], threshold: Int, lastExecutedAt: Option[Date]): Seq[String] =
     pageList.filter(page => {
       val starCount = fetchStarCount(page.url)
       starCount > threshold
+    }).filter(page => {
+      lastExecutedAt match {
+        case Some(pointDate) =>
+          val sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+          sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+          val pageDate = sdf.parse(page.date)
+          pageDate.after(pointDate)
+        case None => true
+      }
     }).map(_.url)
-  }
 
   /**
     * 対象の URL のはてなブックマーク件数を取得する
