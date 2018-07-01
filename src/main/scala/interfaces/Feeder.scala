@@ -5,7 +5,7 @@ import java.util.{Date, TimeZone}
 
 import com.softwaremill.sttp._
 import domain.Extractor.extractPage
-import domain.Page
+import domain.{DeliveredPage, Page}
 
 /**
   * RSS に関する処理を行う。
@@ -19,7 +19,7 @@ object Feeder {
     * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
     * @return 条件を満たした URL の一覧
     */
-  def fetchUrlList(feedUrl: String, threshold: Int, lastExecutedAt: Option[Date]): Seq[String] = {
+  def fetchPageList(feedUrl: String, threshold: Int, lastExecutedAt: Option[Date]): Seq[Page] = {
     val deliveredPageList = fetchDeliveredPageList(feedUrl)
     filter(deliveredPageList, threshold, lastExecutedAt)
   }
@@ -29,7 +29,7 @@ object Feeder {
     *
     * @return 配信されたページの一覧
     */
-  private def fetchDeliveredPageList(feedUrl: String): Seq[Page] = {
+  private def fetchDeliveredPageList(feedUrl: String): Seq[DeliveredPage] = {
     val request = sttp.get(uri"$feedUrl")
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
@@ -45,20 +45,22 @@ object Feeder {
     * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
     * @return 絞り込んだ後の URL の一覧
     */
-  private def filter(pageList: Seq[Page], threshold: Int, lastExecutedAt: Option[Date]): Seq[String] =
-    pageList.filter(page => {
+  private def filter(pageList: Seq[DeliveredPage], threshold: Int, lastExecutedAt: Option[Date]): Seq[Page] = {
+    val sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+    pageList.map(page => {
       val starCount = fetchStarCount(page.url)
-      starCount > threshold
+      val commentUrl = buildCommentUrl(page.url)
+      Page(page.url, page.date, starCount, commentUrl)
     }).filter(page => {
-      lastExecutedAt match {
+      page.hatenaBookmarkCount > threshold && (lastExecutedAt match {
         case Some(pointDate) =>
-          val sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-          sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
           val pageDate = sdf.parse(page.date)
           pageDate.after(pointDate)
         case None => true
-      }
-    }).map(_.url)
+      })
+    })
+  }
 
   /**
     * 対象の URL のはてなブックマーク件数を取得する。
@@ -71,5 +73,17 @@ object Feeder {
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
     response.body.getOrElse("0").toInt
+  }
+
+  /**
+    * はてなブックマークコメントページの URL を構築する
+    *
+    * @param url この URL へのコメントページの URL を構築する
+    * @return はてなブックマークコメントページの URL
+    */
+  private def buildCommentUrl(url: String): String = {
+    val connector = if (url(4) == 's') {"s/"} else {""}
+    val path = url.split(':')(1).drop(2)
+    s"http://b.hatena.ne.jp/entry/$connector$path"
   }
 }
