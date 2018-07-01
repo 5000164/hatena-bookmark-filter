@@ -29,7 +29,7 @@ object Feeder {
     *
     * @return 配信されたページの一覧
     */
-  def fetchDeliveredPageList(feedUrl: String): Seq[Page] = {
+  private def fetchDeliveredPageList(feedUrl: String): Seq[Page] = {
     val request = sttp.get(uri"$feedUrl")
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
@@ -45,7 +45,7 @@ object Feeder {
     * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
     * @return 絞り込んだ後の URL の一覧
     */
-  def filter(pageList: Seq[Page], threshold: Int, lastExecutedAt: Option[Date]): Seq[String] =
+  private def filter(pageList: Seq[Page], threshold: Int, lastExecutedAt: Option[Date]): Seq[String] =
     pageList.filter(page => {
       val starCount = fetchStarCount(page.url)
       starCount > threshold
@@ -66,7 +66,7 @@ object Feeder {
     * @param url 調査する対象の URL
     * @return 対象の URL のはてなブックマーク件数
     */
-  def fetchStarCount(url: String): Int = {
+  private def fetchStarCount(url: String): Int = {
     val request = sttp.get(uri"http://api.b.st-hatena.com/entry.count?${Map("url" -> url)}")
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
     val response = request.send()
