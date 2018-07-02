@@ -1,11 +1,16 @@
 package interfaces
 
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.{Date, TimeZone}
 
 import com.softwaremill.sttp._
 import domain.Extractor.extractPage
 import domain.{DeliveredPage, Page}
+import slick.jdbc.SQLiteProfile.api._
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 /**
   * RSS に関する処理を行う。
@@ -20,8 +25,43 @@ object Feeder {
     * @return 条件を満たした URL の一覧
     */
   def fetchPageList(feedUrl: String, threshold: Int, lastExecutedAt: Option[Date]): Seq[Page] = {
-    val deliveredPageList = fetchDeliveredPageList(feedUrl)
-    filter(deliveredPageList, threshold, lastExecutedAt)
+
+    val databasePath = "./db.db"
+
+    class Articles(tag: Tag) extends Table[(Int, String)](tag, "ARTICLES") {
+      def id = column[Int]("ARTICLE_ID", O.AutoInc, O.PrimaryKey)
+      def url = column[String]("URL")
+      def * = (id, url)
+    }
+    val articles = TableQuery[Articles]
+
+    val db = Database.forURL(s"jdbc:sqlite:$databasePath", driver = "org.sqlite.JDBC")
+    try {
+      if (!new File(databasePath).exists()) {
+        val setup = DBIO.seq(
+          articles.schema.create
+        )
+        db.run(setup)
+      }
+
+      val deliveredPageList = fetchDeliveredPageList(feedUrl)
+
+      deliveredPageList.foreach(p => {
+        val insertActions = DBIO.seq(
+          articles += (0, p.url)
+        )
+        db.run(insertActions)
+      })
+
+      val filtered = filter(deliveredPageList, threshold, lastExecutedAt)
+
+      filtered.filter(f => {
+        val q = articles.filter(_.url === f.url).exists
+        val action = q.result
+        val result = db.run(action)
+        !Await.result(result, Duration.Inf)
+      })
+    } finally db.close
   }
 
   /**
@@ -52,14 +92,7 @@ object Feeder {
       val starCount = fetchStarCount(page.url)
       val commentUrl = buildCommentUrl(page.url)
       Page(page.url, page.date, starCount, commentUrl)
-    }).filter(page => {
-      page.hatenaBookmarkCount > threshold && (lastExecutedAt match {
-        case Some(pointDate) =>
-          val pageDate = sdf.parse(page.date)
-          pageDate.after(pointDate)
-        case None => true
-      })
-    })
+    }).filter(_.hatenaBookmarkCount > threshold)
   }
 
   /**
