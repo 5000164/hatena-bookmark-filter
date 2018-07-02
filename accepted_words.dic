@@ -8,3 +8,6 @@ emoji
 gilbertw
 typesafe
 hikaricp
+jdbc
+sqlite
+xerial
