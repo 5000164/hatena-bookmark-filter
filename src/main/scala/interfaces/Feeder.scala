@@ -45,22 +45,21 @@ object Feeder {
       }
 
       val deliveredPageList = fetchDeliveredPageList(feedUrl)
+      val filtered = filter(deliveredPageList, threshold, lastExecutedAt).filter(f => {
+        val q = articles.filter(_.url === f.url).exists
+        val action = q.result
+        val result = db.run(action)
+        !Await.result(result, Duration.Inf)
+      })
 
-      deliveredPageList.foreach(p => {
+      filtered.foreach(p => {
         val insertActions = DBIO.seq(
           articles += (0, p.url)
         )
         Await.result(db.run(insertActions), Duration.Inf)
       })
 
-      val filtered = filter(deliveredPageList, threshold, lastExecutedAt)
-
-      filtered.filter(f => {
-        val q = articles.filter(_.url === f.url).exists
-        val action = q.result
-        val result = db.run(action)
-        !Await.result(result, Duration.Inf)
-      })
+      filtered
     } finally db.close
   }
 
