@@ -50,7 +50,7 @@ object Feeder {
         val insertActions = DBIO.seq(
           articles += (0, p.url)
         )
-        db.run(insertActions)
+        Await.result(db.run(insertActions), Duration.Inf)
       })
 
       val filtered = filter(deliveredPageList, threshold, lastExecutedAt)
