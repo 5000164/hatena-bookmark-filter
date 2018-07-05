@@ -1,8 +1,6 @@
 package interfaces
 
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.{Date, TimeZone}
 
 import com.softwaremill.sttp._
 import domain.Extractor.extractPage
@@ -20,11 +18,10 @@ object Feeder {
   /**
     * 条件を満たした URL の一覧を取得する。
     *
-    * @param watches        購読対象の設定一覧
-    * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
+    * @param watches 購読対象の設定一覧
     * @return 条件を満たした URL の一覧
     */
-  def fetchPageList(watches: Seq[WatchSettings], lastExecutedAt: Option[Date]): Seq[Page] = {
+  def fetchPageList(watches: Seq[WatchSettings]): Seq[Page] = {
     val databasePath = "./db.db"
     class Articles(tag: Tag) extends Table[(Int, String)](tag, "ARTICLES") {
       def id = column[Int]("ARTICLE_ID", O.AutoInc, O.PrimaryKey)
@@ -44,7 +41,7 @@ object Feeder {
 
       watches.flatMap(watchSettings => {
         val deliveredPageList = fetchDeliveredPageList(watchSettings.feedUrl)
-        val filtered = filter(deliveredPageList, watchSettings.threshold, lastExecutedAt, watchSettings.slack).filter(f => {
+        val filtered = filter(deliveredPageList, watchSettings.threshold, watchSettings.slack).filter(f => {
           val q = articles.filter(_.url === f.url).exists
           val action = q.result
           val result = db.run(action)
@@ -79,14 +76,11 @@ object Feeder {
   /**
     * 条件を元に絞り込む。
     *
-    * @param pageList       調査する対象のページ一覧
-    * @param threshold      しきい値とするはてなブックマーク件数
-    * @param lastExecutedAt 更新されたページのみを取得するため使用する最終実行日時
+    * @param pageList  調査する対象のページ一覧
+    * @param threshold しきい値とするはてなブックマーク件数
     * @return 絞り込んだ後の URL の一覧
     */
-  private def filter(pageList: Seq[DeliveredPage], threshold: Int, lastExecutedAt: Option[Date], slackSettings: SlackSettings): Seq[Page] = {
-    val sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-    sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+  private def filter(pageList: Seq[DeliveredPage], threshold: Int, slackSettings: SlackSettings): Seq[Page] = {
     pageList.map(page => {
       val starCount = fetchStarCount(page.url)
       val commentUrl = buildCommentUrl(page.url)

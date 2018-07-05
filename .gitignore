@@ -1,5 +1,4 @@
 target/
 .idea/
 src/main/resources/Settings.scala
-.record
 db.db
