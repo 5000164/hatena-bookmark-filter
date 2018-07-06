@@ -1,6 +1,6 @@
 package domain
 
-case class Page(
+case class Article(
     url: String,
     date: String,
     hatenaBookmarkCount: Int,
@@ -9,6 +9,6 @@ case class Page(
     userName: String,
     iconEmoji: String)
 
-case class DeliveredPage(
+case class DeliveredArticle(
     url: String,
     date: String)
