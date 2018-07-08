@@ -2,7 +2,7 @@ package interfaces
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import domain.Page
+import domain.Article
 import slack.api.BlockingSlackApiClient
 
 import scala.concurrent.ExecutionContextExecutor
@@ -14,22 +14,19 @@ object Slack {
   /**
     * 投稿する。
     *
-    * @param token    接続する Bot ユーザーのトークン
-    * @param pageList 投稿内容
+    * @param token   接続する Bot ユーザーのトークン
+    * @param article 投稿する記事
     */
-  def post(token: String, pageList: Seq[Page]): Unit = {
+  def post(token: String, article: Article): Unit = {
     implicit val system: ActorSystem = ActorSystem("slack")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val client = BlockingSlackApiClient(token)
-    pageList.foreach(page => {
-      val message = s"はてなブックマーク数: ${page.hatenaBookmarkCount}\n${page.url}\n${page.commentUrl}"
-      client.postChatMessage(
-        channelId = page.postChannelId,
-        text = message,
-        unfurlLinks = Some(true),
-        username = Some(page.userName),
-        iconEmoji = Some(page.iconEmoji))
-    })
+    client.postChatMessage(
+      channelId = article.postChannelId,
+      text = article.toSlackString,
+      unfurlLinks = Some(true),
+      username = Some(article.userName),
+      iconEmoji = Some(article.iconEmoji))
 
     Http().shutdownAllConnectionPools().onComplete { _ =>
       system.terminate
