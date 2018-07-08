@@ -7,14 +7,16 @@ import scala.xml.{Elem, Node, NodeSeq, XML}
   */
 object Extractor {
   /**
-    * ページ一覧を抽出する。
+    * 記事一覧を抽出する。
     *
-    * @param xmlString 抽出対象の XML 形式の文字列
-    * @return 抽出結果
+    * @param feedUrl      抽出元の RSS の URL
+    * @param fetchContent 対象の URL の内容を取得する処理
+    * @return 抽出した配信記事一覧
     */
-  def extractPage(xmlString: String): Seq[DeliveredPage] = {
+  def fetchDeliveredArticles(feedUrl: String, fetchContent: String => String): Seq[DeliveredArticle] = {
+    val xmlString = fetchContent(feedUrl)
     val xml = XML.loadString(xmlString)
-    getItems(xml).map(getPage)
+    getItems(xml).map(getArticle)
   }
 
   /**
@@ -26,14 +28,14 @@ object Extractor {
   private def getItems(element: Elem): NodeSeq = element \ "item"
 
   /**
-    * ページを抽出する。
+    * 記事を抽出する。
     *
     * @param node 抽出対象のノード
-    * @return 抽出したページ
+    * @return 抽出した記事
     */
-  private def getPage(node: Node): DeliveredPage = {
+  private def getArticle(node: Node): DeliveredArticle = {
     val url = (node \ "link").text
     val date = (node \ "date").text
-    DeliveredPage(url, date)
+    DeliveredArticle(url, date)
   }
 }
