@@ -1,6 +1,6 @@
 package domain
 
-import domain.Extractor.extractArticle
+import domain.Extractor.fetchDeliveredArticles
 import org.scalatest.FeatureSpec
 
 import scala.io.Source
@@ -8,8 +8,9 @@ import scala.io.Source
 class ExtractorSpec extends FeatureSpec {
   feature("記事を抽出できる") {
     scenario("XML から記事を抽出する") {
-      val rss = Source.fromResource("sample.rss").getLines.mkString
-      assert(extractArticle(rss) === Seq(
+      assert(fetchDeliveredArticles(
+        feedUrl = "feedUrl",
+        fetchContent = _ => Source.fromResource("sample.rss").getLines.mkString) === Seq(
         DeliveredArticle("http://gendai.ismedia.jp/articles/-/56258", "2018-07-01T01:26:51Z"),
         DeliveredArticle("http://hosyusokuhou.jp/archives/48819730.html", "2018-07-01T04:27:25Z"),
         DeliveredArticle("https://togetter.com/li/1241708", "2018-06-30T19:23:26Z"),
