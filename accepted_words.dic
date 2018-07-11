@@ -11,3 +11,4 @@ hikaricp
 jdbc
 sqlite
 xerial
+flywaydb
