@@ -4,6 +4,7 @@ scalaVersion := "2.12.6"
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint")
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
+libraryDependencies += "org.flywaydb" % "flyway-core" % "5.1.4"
 libraryDependencies += "com.typesafe.slick" %% "slick" % "3.2.3"
 libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.6.4"
 libraryDependencies += "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3"
