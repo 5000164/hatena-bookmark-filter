@@ -10,9 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-/**
-  * アプリを起動する。
-  */
+/** アプリを起動する。 */
 object Application extends App {
   val databasePath = "./db.db"
   val articles = TableQuery[Articles]
