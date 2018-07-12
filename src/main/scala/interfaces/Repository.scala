@@ -7,12 +7,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Random
 
-/**
-  * DB に関する処理を行う。
-  */
+/** DB に関する処理を行う。 */
 object Repository {
-  /**
-    * URL を保存する。
+  /** URL を保存する。
     *
     * @param db  接続先の DB
     * @param url 保存する URL
@@ -54,8 +51,7 @@ object Repository {
     }
   }
 
-  /**
-    * URL がすでに存在するか判断する。
+  /** URL がすでに存在するか判断する。
     *
     * @param db  接続先の DB
     * @param url 検索する URL
@@ -70,8 +66,7 @@ object Repository {
   }
 }
 
-/**
-  * 投稿済みの記事一覧を保存するテーブルを表現する。
+/** 投稿済みの記事一覧を保存するテーブルを表現する。
   *
   * @param tag Slick を使う際に必要そうだが、よくわかっていない
   */
