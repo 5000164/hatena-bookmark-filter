@@ -25,9 +25,10 @@ case class Article(
     *
     * @return Slack へ投稿する内容
     */
-  def toSlackString: String = s"""はてなブックマーク数: $bookmarkCount
-                                 |$url
-                                 |$commentUrl""".stripMargin
+  def toSlackString: String =
+    s"""はてなブックマーク数: $bookmarkCount
+       |$url
+       |$commentUrl""".stripMargin
 }
 
 /** Article のコンパニオンオブジェクト。 */
