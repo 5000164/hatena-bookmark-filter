@@ -1,5 +1,6 @@
 package interfaces
 
+import infrastructure.Tables.{Articles, ArticlesRow}
 import slick.jdbc.SQLiteProfile.api._
 import slick.jdbc.SQLiteProfile.backend.DatabaseDef
 
@@ -7,12 +8,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Random
 
-/**
-  * DB に関する処理を行う。
-  */
+/** DB に関する処理を行う。 */
 object Repository {
-  /**
-    * URL を保存する。
+  /** URL を保存する。
     *
     * @param db  接続先の DB
     * @param url 保存する URL
@@ -21,7 +19,7 @@ object Repository {
   def save(db: DatabaseDef, url: String): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val insertActions = DBIO.seq(
-      articles += (0, url)
+      articles += ArticlesRow(None, url)
     )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
@@ -54,8 +52,7 @@ object Repository {
     }
   }
 
-  /**
-    * URL がすでに存在するか判断する。
+  /** URL がすでに存在するか判断する。
     *
     * @param db  接続先の DB
     * @param url 検索する URL
@@ -68,15 +65,4 @@ object Repository {
     val result = db.run(action)
     Await.result(result, Duration.Inf)
   }
-}
-
-/**
-  * 投稿済みの記事一覧を保存するテーブルを表現する。
-  *
-  * @param tag Slick を使う際に必要そうだが、よくわかっていない
-  */
-class Articles(tag: Tag) extends Table[(Int, String)](tag, "ARTICLES") {
-  def id = column[Int]("ARTICLE_ID", O.AutoInc, O.PrimaryKey)
-  def url = column[String]("URL")
-  def * = (id, url)
 }

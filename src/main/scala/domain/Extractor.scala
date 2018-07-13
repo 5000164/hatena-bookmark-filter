@@ -2,12 +2,9 @@ package domain
 
 import scala.xml.{Elem, Node, NodeSeq, XML}
 
-/**
-  * 抽出する処理を行う。
-  */
+/** 抽出する処理を行う。 */
 object Extractor {
-  /**
-    * 記事一覧を抽出する。
+  /** 記事一覧を抽出する。
     *
     * @param feedUrl      抽出元の RSS の URL
     * @param fetchContent 対象の URL の内容を取得する処理
@@ -19,16 +16,14 @@ object Extractor {
     getItems(xml).map(getArticle)
   }
 
-  /**
-    * 処理対象の一覧を取得する。
+  /** 処理対象の一覧を取得する。
     *
     * @param element 抽出対象の XML
     * @return 処理対象の一覧
     */
   private def getItems(element: Elem): NodeSeq = element \ "item"
 
-  /**
-    * 記事を抽出する。
+  /** 記事を抽出する。
     *
     * @param node 抽出対象のノード
     * @return 抽出した記事

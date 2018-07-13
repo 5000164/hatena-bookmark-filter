@@ -2,8 +2,7 @@ package domain
 
 import interfaces.HatenaBookmark
 
-/**
-  * 記事を表現する。
+/** 記事を表現する。
   *
   * @param url           URL
   * @param date          作成日
@@ -22,19 +21,17 @@ case class Article(
     userName: String,
     iconEmoji: String) {
 
-  /**
-    * Slack への投稿用に整形する。
+  /** Slack への投稿用に整形する。
     *
     * @return Slack へ投稿する内容
     */
-  def toSlackString: String = s"""はてなブックマーク数: $bookmarkCount
-                                 |$url
-                                 |$commentUrl""".stripMargin
+  def toSlackString: String =
+    s"""はてなブックマーク数: $bookmarkCount
+       |$url
+       |$commentUrl""".stripMargin
 }
 
-/**
-  * Article のコンパニオンオブジェクト。
-  */
+/** Article のコンパニオンオブジェクト。 */
 object Article {
   /**
     * commentUrl は渡されてから構築する。
@@ -56,8 +53,7 @@ object Article {
       iconEmoji: String): Article = new Article(url, date, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
 }
 
-/**
-  * RSS で配信された情報を表現する。
+/** RSS で配信された情報を表現する。
   *
   * @param url  URL
   * @param date 作成日
