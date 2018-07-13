@@ -12,3 +12,4 @@ jdbc
 sqlite
 xerial
 flywaydb
+codegen
