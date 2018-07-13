@@ -1,7 +1,5 @@
 package interfaces
 
-import java.io.File
-
 import domain.{Article, Extractor, Judge}
 import infrastructure.Settings.settings
 import slick.jdbc.SQLiteProfile.api._
@@ -10,21 +8,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-/**
-  * アプリを起動する。
-  */
+/** アプリを起動する。 */
 object Application extends App {
-  val databasePath = "./db.db"
-  val articles = TableQuery[Articles]
-  val db = Database.forURL(s"jdbc:sqlite:$databasePath", driver = "org.sqlite.JDBC")
+  val db = Database.forURL("jdbc:sqlite:./db.db", driver = "org.sqlite.JDBC")
   try {
-    if (!new File(databasePath).exists()) {
-      val setup = DBIO.seq(
-        articles.schema.create
-      )
-      db.run(setup)
-    }
-
     Await.ready(Future.sequence(for {
       watchSettings <- settings.watches
       deliveredArticle <- Extractor.fetchDeliveredArticles(watchSettings.feedUrl, Client.fetchContent)

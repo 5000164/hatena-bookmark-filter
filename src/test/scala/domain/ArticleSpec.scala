@@ -11,9 +11,10 @@ class ArticleSpec extends FeatureSpec {
         bookmarkCount = 0,
         postChannelId = "postChannelId",
         userName = "userName",
-        iconEmoji = "iconEmoji").toSlackString === """はてなブックマーク数: 0
-                                                     |https://blog.5000164.jp/
-                                                     |http://b.hatena.ne.jp/entry/s/blog.5000164.jp/""".stripMargin)
+        iconEmoji = "iconEmoji").toSlackString ===
+        """はてなブックマーク数: 0
+          |https://blog.5000164.jp/
+          |http://b.hatena.ne.jp/entry/s/blog.5000164.jp/""".stripMargin)
     }
   }
 }

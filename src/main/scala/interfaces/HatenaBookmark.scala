@@ -2,12 +2,9 @@ package interfaces
 
 import com.softwaremill.sttp._
 
-/**
-  * はてなブックマークに関する処理を行う。
-  */
+/** はてなブックマークに関する処理を行う。 */
 object HatenaBookmark {
-  /**
-    * 対象の URL のはてなブックマーク件数を取得する。
+  /** 対象の URL のはてなブックマーク件数を取得する。
     *
     * @param url 調査する対象の URL
     * @return 対象の URL のはてなブックマーク件数
@@ -17,8 +14,7 @@ object HatenaBookmark {
     sttp.get(uri"http://api.b.st-hatena.com/entry.count?${Map("url" -> url)}").send().body.getOrElse("0").toInt
   }
 
-  /**
-    * はてなブックマークコメントページの URL を構築する。
+  /** はてなブックマークコメントページの URL を構築する。
     *
     * @param url この URL へのコメントページの URL を構築する
     * @return はてなブックマークコメントページの URL
