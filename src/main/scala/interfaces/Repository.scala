@@ -1,5 +1,6 @@
 package interfaces
 
+import infrastructure.Tables.{Articles, ArticlesRow}
 import slick.jdbc.SQLiteProfile.api._
 import slick.jdbc.SQLiteProfile.backend.DatabaseDef
 
@@ -18,7 +19,7 @@ object Repository {
   def save(db: DatabaseDef, url: String): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val insertActions = DBIO.seq(
-      articles += (0, url)
+      articles += ArticlesRow(None, url)
     )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
@@ -64,14 +65,4 @@ object Repository {
     val result = db.run(action)
     Await.result(result, Duration.Inf)
   }
-}
-
-/** 投稿済みの記事一覧を保存するテーブルを表現する。
-  *
-  * @param tag Slick を使う際に必要そうだが、よくわかっていない
-  */
-class Articles(tag: Tag) extends Table[(Int, String)](tag, "ARTICLES") {
-  def id = column[Int]("ARTICLE_ID", O.AutoInc, O.PrimaryKey)
-  def url = column[String]("URL")
-  def * = (id, url)
 }
