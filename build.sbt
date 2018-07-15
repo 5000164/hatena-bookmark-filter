@@ -14,3 +14,5 @@ libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.2.1"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 libraryDependencies += "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
+
+mainClass in assembly := Some("interfaces.Application")
