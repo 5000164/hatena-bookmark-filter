@@ -16,3 +16,4 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 libraryDependencies += "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
 
 mainClass in assembly := Some("interfaces.Application")
+assemblyJarName in assembly := "hatena-bookmark-filter.jar"
