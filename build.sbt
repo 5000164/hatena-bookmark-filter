@@ -1,5 +1,5 @@
 name := "hatena-bookmark-filter"
-version := "1.0.0"
+version := "1.1.0"
 scalaVersion := "2.12.6"
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint")
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
