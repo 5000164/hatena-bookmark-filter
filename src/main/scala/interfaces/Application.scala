@@ -19,8 +19,10 @@ object Application extends App {
       Judge.refine(deliveredArticle.url, watchSettings.threshold, Repository.existsUrl(db, _), HatenaBookmark.fetchBookmarkCount) match {
         case Some(bookmarkCount) =>
           val article = Article(deliveredArticle.url, deliveredArticle.date, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-          Slack.post(settings.slackToken, article)
-          Repository.save(db, article.url)
+          Slack.post(settings.slackToken, article) match {
+            case Right(_) => Repository.save(db, article.url)
+            case Left(_) =>
+          }
         case None =>
       }
     }), Duration.Inf)
