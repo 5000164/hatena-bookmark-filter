@@ -19,7 +19,7 @@ object Repository {
   def save(db: DatabaseDef, url: String): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val insertActions = DBIO.seq(
-      articles += ArticlesRow(None, url)
+      articles += ArticlesRow(None, url, 1, java.time.ZonedDateTime.now.toEpochSecond.toInt, java.time.ZonedDateTime.now.toEpochSecond.toInt)
     )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
