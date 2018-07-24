@@ -16,7 +16,7 @@ object Migrate extends App {
     profile = "slick.jdbc.SQLiteProfile",
     jdbcDriver = "org.sqlite.JDBC",
     url = url,
-    outputDir = "src/main/scala",
+    outputDir = "collector/src/main/scala",
     pkg = "infrastructure",
     user = None,
     password = None,
