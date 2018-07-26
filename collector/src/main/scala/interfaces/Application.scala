@@ -1,5 +1,6 @@
 package interfaces
 
+import com.typesafe.scalalogging.LazyLogging
 import domain.{Article, Extractor, Judge}
 import infrastructure.Settings.settings
 import slick.jdbc.SQLiteProfile.api._
@@ -9,7 +10,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 /** アプリを起動する。 */
-object Application extends App {
+object Application extends App with LazyLogging {
+  logger.info("実行開始")
+
   val db = Database.forURL("jdbc:sqlite:./db.db", driver = "org.sqlite.JDBC")
   try {
     Await.ready(Future.sequence(for {
@@ -27,4 +30,6 @@ object Application extends App {
       }
     }), Duration.Inf)
   } finally db.close
+
+  logger.info("実行終了")
 }
