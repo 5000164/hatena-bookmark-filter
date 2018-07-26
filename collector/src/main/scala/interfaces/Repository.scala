@@ -7,6 +7,7 @@ import slick.jdbc.SQLiteProfile.backend.DatabaseDef
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Random
+import scala.util.control.NonFatal
 
 /** DB に関する処理を行う。 */
 object Repository {
@@ -24,27 +25,27 @@ object Repository {
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
-      case _: Throwable =>
+      case NonFatal(_) =>
         Thread.sleep((Random.nextInt(91) + 10) * 100)
         try {
           Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
         } catch {
-          case _: Throwable =>
+          case NonFatal(_) =>
             Thread.sleep((Random.nextInt(91) + 10) * 100)
             try {
               Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
             } catch {
-              case _: Throwable =>
+              case NonFatal(_) =>
                 Thread.sleep((Random.nextInt(91) + 10) * 100)
                 try {
                   Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                 } catch {
-                  case _: Throwable =>
+                  case NonFatal(_) =>
                     Thread.sleep((Random.nextInt(91) + 10) * 100)
                     try {
                       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                     } catch {
-                      case e: Throwable => Left(e)
+                      case NonFatal(e) => Left(e)
                     }
                 }
             }
