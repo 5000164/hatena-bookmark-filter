@@ -1,5 +1,6 @@
 package interfaces
 
+import com.typesafe.scalalogging.LazyLogging
 import infrastructure.Tables.{Articles, ArticlesRow}
 import slick.jdbc.SQLiteProfile.api._
 import slick.jdbc.SQLiteProfile.backend.DatabaseDef
@@ -10,7 +11,7 @@ import scala.util.Random
 import scala.util.control.NonFatal
 
 /** DB に関する処理を行う。 */
-object Repository {
+object Repository extends LazyLogging {
   /** URL を保存する。
     *
     * @param db  接続先の DB
@@ -25,27 +26,33 @@ object Repository {
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
-      case NonFatal(_) =>
+      case NonFatal(e1) =>
+        logger.info("1 度目の失敗: " + e1.toString)
         Thread.sleep((Random.nextInt(91) + 10) * 100)
         try {
           Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
         } catch {
-          case NonFatal(_) =>
+          case NonFatal(e2) =>
+            logger.info("2 度目の失敗: " + e2.toString)
             Thread.sleep((Random.nextInt(91) + 10) * 100)
             try {
               Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
             } catch {
-              case NonFatal(_) =>
+              case NonFatal(e3) =>
+                logger.info("3 度目の失敗: " + e3.toString)
                 Thread.sleep((Random.nextInt(91) + 10) * 100)
                 try {
                   Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                 } catch {
-                  case NonFatal(_) =>
+                  case NonFatal(e4) =>
+                    logger.info("4 度目の失敗: " + e4.toString)
                     Thread.sleep((Random.nextInt(91) + 10) * 100)
                     try {
                       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                     } catch {
-                      case NonFatal(e) => Left(e)
+                      case NonFatal(e5) =>
+                        logger.error("5 度目の失敗: " + e5.toString)
+                        Left(e5)
                     }
                 }
             }
