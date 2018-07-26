@@ -2,3 +2,5 @@ target/
 .idea/
 db.db
 *.settings
+logs/*
+!logs/.gitkeep
