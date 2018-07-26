@@ -25,22 +25,22 @@ object Repository {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
       case _: Throwable =>
-        Thread.sleep((Random.nextInt(11) + 5) * 100)
+        Thread.sleep((Random.nextInt(91) + 10) * 100)
         try {
           Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
         } catch {
           case _: Throwable =>
-            Thread.sleep((Random.nextInt(11) + 5) * 100)
+            Thread.sleep((Random.nextInt(91) + 10) * 100)
             try {
               Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
             } catch {
               case _: Throwable =>
-                Thread.sleep((Random.nextInt(11) + 5) * 100)
+                Thread.sleep((Random.nextInt(91) + 10) * 100)
                 try {
                   Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                 } catch {
                   case _: Throwable =>
-                    Thread.sleep((Random.nextInt(11) + 5) * 100)
+                    Thread.sleep((Random.nextInt(91) + 10) * 100)
                     try {
                       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                     } catch {
