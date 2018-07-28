@@ -24,7 +24,7 @@ object Application extends App with LazyLogging {
           val article = Article(deliveredArticle.url, deliveredArticle.date, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
           Slack.post(settings.slackToken, article) match {
             case Right(_) => Repository.save(db, article.url)
-            case Left(_) =>
+            case Left(e) => logger.error(s"保存処理に失敗 $article", e)
           }
         case None =>
       }

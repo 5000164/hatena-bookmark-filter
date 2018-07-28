@@ -27,31 +27,31 @@ object Repository extends LazyLogging {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
       case NonFatal(e1) =>
-        logger.info("1 度目の失敗: " + e1.toString)
+        logger.info(s"保存失敗 1 回目 $url", e1)
         Thread.sleep((Random.nextInt(91) + 10) * 100)
         try {
           Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
         } catch {
           case NonFatal(e2) =>
-            logger.info("2 度目の失敗: " + e2.toString)
+            logger.info(s"保存失敗 2 回目 $url", e2)
             Thread.sleep((Random.nextInt(91) + 10) * 100)
             try {
               Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
             } catch {
               case NonFatal(e3) =>
-                logger.info("3 度目の失敗: " + e3.toString)
+                logger.info(s"保存失敗 3 回目 $url", e3)
                 Thread.sleep((Random.nextInt(91) + 10) * 100)
                 try {
                   Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                 } catch {
                   case NonFatal(e4) =>
-                    logger.info("4 度目の失敗: " + e4.toString)
+                    logger.info(s"保存失敗 4 回目 $url", e4)
                     Thread.sleep((Random.nextInt(91) + 10) * 100)
                     try {
                       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
                     } catch {
                       case NonFatal(e5) =>
-                        logger.error("5 度目の失敗: " + e5.toString)
+                        logger.info(s"保存失敗 5 回目 $url", e5)
                         Left(e5)
                     }
                 }
