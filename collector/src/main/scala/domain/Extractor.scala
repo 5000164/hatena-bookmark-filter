@@ -30,7 +30,6 @@ object Extractor {
     */
   private def getArticle(node: Node): DeliveredArticle = {
     val url = (node \ "link").text
-    val date = (node \ "date").text
-    DeliveredArticle(url, date)
+    DeliveredArticle(url)
   }
 }

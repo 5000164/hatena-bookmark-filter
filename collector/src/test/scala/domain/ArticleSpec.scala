@@ -7,7 +7,6 @@ class ArticleSpec extends FeatureSpec {
     scenario("オブジェクトを変換する") {
       assert(Article(
         url = "https://blog.5000164.jp/",
-        date = "date",
         bookmarkCount = 0,
         postChannelId = "postChannelId",
         userName = "userName",
