@@ -7,15 +7,15 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/app.log</file>
+        <file>logs/application_log.ltsv</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>date:%d{yyyy-MM-dd HH:mm:ss.SSS}&#x9;thread:%thread&#x9;level:%level&#x9;logger:%logger&#x9;message:%replace(%replace(%message){'\n','\\n'}){'\t','\\t'}&#x9;exception:%replace(%replace(%xException){'\n','\\n'}){'\t','\\t'}%n%nopexception</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/app.log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logs/application_log.%d{yyyy-MM-dd}.ltsv</fileNamePattern>
         </rollingPolicy>
     </appender>
 
