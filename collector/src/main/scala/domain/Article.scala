@@ -5,7 +5,7 @@ import interfaces.HatenaBookmark
 /** 記事を表現する。
   *
   * @param url           URL
-  * @param date          作成日
+  * @param title         タイトル
   * @param bookmarkCount ブックマーク数
   * @param commentUrl    コメントページの URL
   * @param postChannelId Slack の投稿先チャンネル
@@ -14,7 +14,7 @@ import interfaces.HatenaBookmark
   */
 case class Article(
     url: String,
-    date: String,
+    title: String,
     bookmarkCount: Int,
     commentUrl: String,
     postChannelId: String,
@@ -26,7 +26,7 @@ case class Article(
     * @return Slack へ投稿する内容
     */
   def toSlackString: String =
-    s"""はてなブックマーク数: $bookmarkCount
+    s"""$title: $bookmarkCount
        |$url
        |$commentUrl""".stripMargin
 }
@@ -37,7 +37,7 @@ object Article {
     * commentUrl は渡されてから構築する。
     *
     * @param url           URL
-    * @param date          作成日
+    * @param title         タイトル
     * @param bookmarkCount ブックマーク数
     * @param postChannelId Slack の投稿先チャンネル
     * @param userName      Slack での投稿名
@@ -46,18 +46,18 @@ object Article {
     */
   def apply(
       url: String,
-      date: String,
+      title: String,
       bookmarkCount: Int,
       postChannelId: String,
       userName: String,
-      iconEmoji: String): Article = new Article(url, date, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
+      iconEmoji: String): Article = new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
 }
 
 /** RSS で配信された情報を表現する。
   *
-  * @param url  URL
-  * @param date 作成日
+  * @param url   URL
+  * @param title タイトル
   */
 case class DeliveredArticle(
     url: String,
-    date: String)
+    title: String)

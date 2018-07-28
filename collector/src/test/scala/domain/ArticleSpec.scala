@@ -7,12 +7,12 @@ class ArticleSpec extends FeatureSpec {
     scenario("オブジェクトを変換する") {
       assert(Article(
         url = "https://blog.5000164.jp/",
-        date = "date",
+        title = "5000164 is here",
         bookmarkCount = 0,
         postChannelId = "postChannelId",
         userName = "userName",
         iconEmoji = "iconEmoji").toSlackString ===
-        """はてなブックマーク数: 0
+        """5000164 is here: 0
           |https://blog.5000164.jp/
           |http://b.hatena.ne.jp/entry/s/blog.5000164.jp/""".stripMargin)
     }
