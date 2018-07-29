@@ -1,12 +1,20 @@
 name := "hatena-bookmark-filter"
 version := "1.1.1"
 
+lazy val settings = project
+  .settings(
+    name := "settings",
+    commonSettings,
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value
+    )
+  )
+
 lazy val collector = project
   .settings(
     name := "collector",
     commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3",
       "com.softwaremill.sttp" %% "core" % "1.2.1",
@@ -14,6 +22,9 @@ lazy val collector = project
       "org.scalatest" %% "scalatest" % "3.0.5" % "test",
       "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
     )
+  )
+  .dependsOn(
+    settings
   )
 
 lazy val migration = project
