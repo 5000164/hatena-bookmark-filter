@@ -47,6 +47,5 @@ lazy val commonDependencies = Seq(
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.6",
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
-  assemblyJarName in assembly := name.value + ".jar",
-  mainClass in assembly := Some("interfaces.Application")
+  assemblyJarName in assembly := name.value + ".jar"
 )
