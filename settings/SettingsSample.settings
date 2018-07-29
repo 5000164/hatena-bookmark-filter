@@ -1,8 +1,8 @@
 import infrastructure.{SettingsType, SlackSettings, WatchSettings}
 
 new SettingsType {
-  override val watches: Seq[WatchSettings] = Seq(
-    WatchSettings(
+  override val watches: Map[Int, WatchSettings] = Map(
+    1 -> WatchSettings(
       feedUrl = "http://b.hatena.ne.jp/hotentry/all.rss",
       threshold = 500,
       slack = SlackSettings(
@@ -10,7 +10,7 @@ new SettingsType {
         userName = "USER NAME",
         iconEmoji = ":+1:")
     ),
-    WatchSettings(
+    2 -> WatchSettings(
       feedUrl = "http://b.hatena.ne.jp/hotentry/it.rss",
       threshold = 100,
       slack = SlackSettings(

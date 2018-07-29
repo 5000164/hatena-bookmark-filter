@@ -6,6 +6,7 @@ import domain.Article
 import slack.api.BlockingSlackApiClient
 
 import scala.concurrent.ExecutionContextExecutor
+import scala.util.control.NonFatal
 
 /** Slack に関する処理を行う。 */
 object Slack {
@@ -15,7 +16,7 @@ object Slack {
     * @param article 投稿する記事
     * @return 実行結果
     */
-  def post(token: String, article: Article): Either[String, String] = {
+  def post(token: String, article: Article): Either[Throwable, String] = {
     implicit val system: ActorSystem = ActorSystem("slack")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val client = BlockingSlackApiClient(token)
@@ -28,7 +29,7 @@ object Slack {
         iconEmoji = Some(article.iconEmoji)))
     }
     catch {
-      case e: Exception => Left(e.toString)
+      case NonFatal(e) => Left(e)
     }
     finally {
       Http().shutdownAllConnectionPools().onComplete { _ =>

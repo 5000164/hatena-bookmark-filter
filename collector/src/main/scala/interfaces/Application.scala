@@ -16,15 +16,17 @@ object Application extends App with LazyLogging {
   val db = Database.forURL("jdbc:sqlite:./db.db", driver = "org.sqlite.JDBC")
   try {
     Await.ready(Future.sequence(for {
-      watchSettings <- settings.watches
+      (settingsId, watchSettings) <- settings.watches
       deliveredArticle <- Extractor.fetchDeliveredArticles(watchSettings.feedUrl, Client.fetchContent)
     } yield Future {
       Judge.refine(deliveredArticle.url, watchSettings.threshold, Repository.existsUrl(db, _), HatenaBookmark.fetchBookmarkCount) match {
         case Some(bookmarkCount) =>
           val article = Article(deliveredArticle.url, deliveredArticle.title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-          Slack.post(settings.slackToken, article) match {
-            case Right(_) => Repository.save(db, article.url)
-            case Left(e) => logger.error(s"保存処理に失敗 $article", e)
+          Slack.post(settings.slackToken, article).toOption.foreach { _ =>
+            Repository.save(db, article.url, settingsId) match {
+              case Right(_) =>
+              case Left(e) => logger.error(s"保存処理に失敗 article:$article, settingsId:$settingsId", e)
+            }
           }
         case None =>
       }

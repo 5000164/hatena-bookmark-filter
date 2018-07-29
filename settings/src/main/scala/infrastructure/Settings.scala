@@ -10,7 +10,7 @@ object Settings {
 }
 
 trait SettingsType {
-  val watches: Seq[WatchSettings]
+  val watches: Map[Int, WatchSettings]
   val slackToken: String
 }
 

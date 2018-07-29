@@ -9,7 +9,7 @@ object Migrate extends App {
 
   val flyway = new Flyway()
   flyway.setDataSource(url, "", "")
-  flyway.setLocations(s"filesystem:${System.getProperty("user.dir")}/src/main/resources/db/migration")
+  flyway.setLocations(s"filesystem:${System.getProperty("user.dir")}/migration/src/main/resources/db/migration")
   flyway.migrate()
 
   SourceCodeGenerator.run(
