@@ -41,7 +41,7 @@ lazy val commonDependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.typesafe.slick" %% "slick" % "3.2.3",
-  "org.xerial" % "sqlite-jdbc" % "3.23.1"
+  "com.h2database" % "h2" % "1.4.197"
 )
 
 lazy val commonSettings = Seq(

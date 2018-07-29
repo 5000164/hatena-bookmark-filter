@@ -1,9 +1,11 @@
 package interfaces
 
+import java.sql.Timestamp
+
 import com.typesafe.scalalogging.LazyLogging
 import infrastructure.Tables.{Articles, ArticlesRow}
-import slick.jdbc.SQLiteProfile.api._
-import slick.jdbc.SQLiteProfile.backend.DatabaseDef
+import slick.jdbc.H2Profile.api._
+import slick.jdbc.H2Profile.backend.DatabaseDef
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -19,10 +21,11 @@ object Repository extends LazyLogging {
     * @param settingsId URL に紐づく設定 ID
     * @return 実行結果
     */
-  def save(db: DatabaseDef, url: String, settingsId: Int): Either[Throwable, Unit] = {
+  def save(db: DatabaseDef, url: String, settingsId: Byte): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
+    val date = new java.util.Date()
     val insertActions = DBIO.seq(
-      articles += ArticlesRow(None, url, settingsId, 1, java.time.ZonedDateTime.now.toEpochSecond.toInt, java.time.ZonedDateTime.now.toEpochSecond.toInt)
+      articles += ArticlesRow(0, url, settingsId, true, new Timestamp(date.getTime), new Timestamp(date.getTime))
     )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))

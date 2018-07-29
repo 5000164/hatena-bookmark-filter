@@ -3,7 +3,7 @@ package interfaces
 import com.typesafe.scalalogging.LazyLogging
 import domain.{Article, Extractor, Judge}
 import infrastructure.Settings.settings
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.H2Profile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -13,7 +13,7 @@ import scala.concurrent.{Await, Future}
 object Application extends App with LazyLogging {
   logger.info("実行開始")
 
-  val db = Database.forURL("jdbc:sqlite:./db.db", driver = "org.sqlite.JDBC")
+  val db = Database.forURL("jdbc:h2:./db", driver = "org.h2.Driver")
   try {
     Await.ready(Future.sequence(for {
       (settingsId, watchSettings) <- settings.watches

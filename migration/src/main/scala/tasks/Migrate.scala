@@ -5,7 +5,7 @@ import slick.codegen.SourceCodeGenerator
 
 /** マイグレートを実行する。 */
 object Migrate extends App {
-  val url = "jdbc:sqlite:./db.db"
+  val url = "jdbc:h2:./db"
 
   val flyway = new Flyway()
   flyway.setDataSource(url, "", "")
@@ -13,8 +13,8 @@ object Migrate extends App {
   flyway.migrate()
 
   SourceCodeGenerator.run(
-    profile = "slick.jdbc.SQLiteProfile",
-    jdbcDriver = "org.sqlite.JDBC",
+    profile = "slick.jdbc.H2Profile",
+    jdbcDriver = "org.h2.Driver",
     url = url,
     outputDir = "collector/src/main/scala",
     pkg = "infrastructure",
