@@ -21,25 +21,28 @@ trait Tables {
   /** Entity class storing rows of table Articles
    *  @param id Database column id SqlType(INTEGER), AutoInc, PrimaryKey
    *  @param url Database column url SqlType(TEXT)
+   *  @param settingsId Database column settings_id SqlType(INTEGER)
    *  @param posted Database column posted SqlType(INTEGER)
    *  @param createdAt Database column created_at SqlType(INTEGER)
    *  @param updatedAt Database column updated_at SqlType(INTEGER) */
-  case class ArticlesRow(id: Option[Int], url: String, posted: Int, createdAt: Int, updatedAt: Int)
+  case class ArticlesRow(id: Option[Int], url: String, settingsId: Int, posted: Int, createdAt: Int, updatedAt: Int)
   /** GetResult implicit for fetching ArticlesRow objects using plain SQL queries */
   implicit def GetResultArticlesRow(implicit e0: GR[Option[Int]], e1: GR[String], e2: GR[Int]): GR[ArticlesRow] = GR{
     prs => import prs._
-    ArticlesRow.tupled((<<?[Int], <<[String], <<[Int], <<[Int], <<[Int]))
+    ArticlesRow.tupled((<<?[Int], <<[String], <<[Int], <<[Int], <<[Int], <<[Int]))
   }
   /** Table description of table articles. Objects of this class serve as prototypes for rows in queries. */
   class Articles(_tableTag: Tag) extends profile.api.Table[ArticlesRow](_tableTag, "articles") {
-    def * = (id, url, posted, createdAt, updatedAt) <> (ArticlesRow.tupled, ArticlesRow.unapply)
+    def * = (id, url, settingsId, posted, createdAt, updatedAt) <> (ArticlesRow.tupled, ArticlesRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (id, Rep.Some(url), Rep.Some(posted), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _2.map(_=> ArticlesRow.tupled((_1, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (id, Rep.Some(url), Rep.Some(settingsId), Rep.Some(posted), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _2.map(_=> ArticlesRow.tupled((_1, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(INTEGER), AutoInc, PrimaryKey */
     val id: Rep[Option[Int]] = column[Option[Int]]("id", O.AutoInc, O.PrimaryKey)
     /** Database column url SqlType(TEXT) */
     val url: Rep[String] = column[String]("url")
+    /** Database column settings_id SqlType(INTEGER) */
+    val settingsId: Rep[Int] = column[Int]("settings_id")
     /** Database column posted SqlType(INTEGER) */
     val posted: Rep[Int] = column[Int]("posted")
     /** Database column created_at SqlType(INTEGER) */

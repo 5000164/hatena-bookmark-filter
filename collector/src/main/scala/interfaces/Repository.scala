@@ -14,14 +14,15 @@ import scala.util.control.NonFatal
 object Repository extends LazyLogging {
   /** URL を保存する。
     *
-    * @param db  接続先の DB
-    * @param url 保存する URL
+    * @param db         接続先の DB
+    * @param url        保存する URL
+    * @param settingsId URL に紐づく設定 ID
     * @return 実行結果
     */
-  def save(db: DatabaseDef, url: String): Either[Throwable, Unit] = {
+  def save(db: DatabaseDef, url: String, settingsId: Int): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val insertActions = DBIO.seq(
-      articles += ArticlesRow(None, url, 1, java.time.ZonedDateTime.now.toEpochSecond.toInt, java.time.ZonedDateTime.now.toEpochSecond.toInt)
+      articles += ArticlesRow(None, url, settingsId, 1, java.time.ZonedDateTime.now.toEpochSecond.toInt, java.time.ZonedDateTime.now.toEpochSecond.toInt)
     )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
