@@ -1,11 +1,11 @@
 package domain
 
-import domain.Extractor.fetchDeliveredArticles
+import domain.Articles.{fetchDeliveredArticles, refine}
 import org.scalatest.FeatureSpec
 
 import scala.io.Source
 
-class ExtractorSpec extends FeatureSpec {
+class ArticlesSpec extends FeatureSpec {
   feature("記事を抽出できる") {
     scenario("XML から記事を抽出する") {
       assert(fetchDeliveredArticles(
@@ -41,6 +41,56 @@ class ExtractorSpec extends FeatureSpec {
         DeliveredArticle("https://okane.news/financial-movies/", "金融リテラシーが上がる！映画まとめ30選｜投資や経済を楽しく学べる | お得に節約お金ニュース"),
         DeliveredArticle("https://samurai20.jp/2018/06/hosyusoku-2/", "保守速報など、まとめサイト群への救済処置（暫定版）【応援する人はシェア】 | 小坪しんやのHP～行橋市議会議員"),
         DeliveredArticle("https://anond.hatelabo.jp/20180701000252", "たまごとうふには豆腐成分が一切入ってないと知った時の衝撃は忘れない")))
+    }
+  }
+
+  feature("URL を絞り込むことができる") {
+    scenario("すでに投稿済みの場合は None になる") {
+      assert(refine(
+        url = "",
+        threshold = 0,
+        existsUrl = _ => true,
+        fetchBookmarkCount = _ => 0) === None)
+    }
+
+    scenario("ブックマーク数がしきい値を下回っている場合は None になる") {
+      assert(refine(
+        url = "",
+        threshold = 2,
+        existsUrl = _ => false,
+        fetchBookmarkCount = _ => 1) === None)
+    }
+
+    scenario("ブックマーク数がしきい値と同じ場合は Some になる") {
+      assert(refine(
+        url = "",
+        threshold = 2,
+        existsUrl = _ => false,
+        fetchBookmarkCount = _ => 2) === Some(2))
+    }
+
+    scenario("ブックマーク数がしきい値を上回っている場合は Some になる") {
+      assert(refine(
+        url = "",
+        threshold = 2,
+        existsUrl = _ => false,
+        fetchBookmarkCount = _ => 3) === Some(3))
+    }
+  }
+
+  feature("Slack に投稿するために変換できる") {
+    scenario("オブジェクトを変換する") {
+      assert(Article(
+        url = "https://blog.5000164.jp/",
+        title = "5000164 is here",
+        bookmarkCount = 0,
+        postChannelId = "postChannelId",
+        userName = "userName",
+        iconEmoji = "iconEmoji").toSlackString ===
+        """:bookmark: 0
+          |5000164 is here
+          |https://blog.5000164.jp/
+          |http://b.hatena.ne.jp/entry/s/blog.5000164.jp/""".stripMargin)
     }
   }
 }
