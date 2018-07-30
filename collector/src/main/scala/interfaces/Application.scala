@@ -1,9 +1,8 @@
 package interfaces
 
 import com.typesafe.scalalogging.LazyLogging
-import domain.{Article, Extractor, Judge}
+import domain.{Article, Articles}
 import infrastructure.Settings.settings
-import slick.jdbc.SQLiteProfile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -13,17 +12,17 @@ import scala.concurrent.{Await, Future}
 object Application extends App with LazyLogging {
   logger.info("実行開始")
 
-  val db = Database.forURL("jdbc:sqlite:./db.db", driver = "org.sqlite.JDBC")
+  val repository = new Repository()
   try {
     Await.ready(Future.sequence(for {
       (settingsId, watchSettings) <- settings.watches
-      deliveredArticle <- Extractor.fetchDeliveredArticles(watchSettings.feedUrl, Client.fetchContent)
+      deliveredArticle <- Articles.fetchDeliveredArticles(watchSettings.feedUrl, Client.fetchContent)
     } yield Future {
-      Judge.refine(deliveredArticle.url, watchSettings.threshold, Repository.existsUrl(db, _), HatenaBookmark.fetchBookmarkCount) match {
+      Articles.refine(deliveredArticle.url, watchSettings.threshold, repository.existsUrl, HatenaBookmark.fetchBookmarkCount) match {
         case Some(bookmarkCount) =>
           val article = Article(deliveredArticle.url, deliveredArticle.title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
           Slack.post(settings.slackToken, article).toOption.foreach { _ =>
-            Repository.save(db, article.url, settingsId) match {
+            repository.save(article.url, settingsId) match {
               case Right(_) =>
               case Left(e) => logger.error(s"保存処理に失敗 article:$article, settingsId:$settingsId", e)
             }
@@ -31,7 +30,7 @@ object Application extends App with LazyLogging {
         case None =>
       }
     }), Duration.Inf)
-  } finally db.close
+  } finally repository.close()
 
   logger.info("実行終了")
 }

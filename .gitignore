@@ -1,6 +1,7 @@
 target/
 .idea/
-db.db
+db.mv.db
+db.trace.db
 *.settings
 !SettingsSample.settings
 logs/*
