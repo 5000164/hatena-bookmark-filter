@@ -12,7 +12,7 @@ class ArticleSpec extends FeatureSpec {
         postChannelId = "postChannelId",
         userName = "userName",
         iconEmoji = "iconEmoji").toSlackString ===
-        """0 :bookmark:
+        """:bookmark: 0
           |5000164 is here
           |https://blog.5000164.jp/
           |http://b.hatena.ne.jp/entry/s/blog.5000164.jp/""".stripMargin)

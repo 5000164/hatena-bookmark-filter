@@ -26,7 +26,7 @@ case class Article(
     * @return Slack へ投稿する内容
     */
   def toSlackString: String =
-    s"""$bookmarkCount :bookmark:
+    s""":bookmark: $bookmarkCount
        |$title
        |$url
        |$commentUrl""".stripMargin
