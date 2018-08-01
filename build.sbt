@@ -10,9 +10,9 @@ lazy val settings = project
     )
   )
 
-lazy val collector = project
+lazy val collect = project
   .settings(
-    name := "collector",
+    name := "collect",
     commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6",

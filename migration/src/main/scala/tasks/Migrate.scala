@@ -16,7 +16,7 @@ object Migrate extends App {
     profile = "slick.jdbc.H2Profile",
     jdbcDriver = "org.h2.Driver",
     url = url,
-    outputDir = "collector/src/main/scala",
+    outputDir = "collect/src/main/scala",
     pkg = "infrastructure",
     user = None,
     password = None,
