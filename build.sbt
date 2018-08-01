@@ -1,9 +1,9 @@
 name := "hatena-bookmark-filter"
 version := "1.1.1"
 
-lazy val settings = project
+lazy val common = project
   .settings(
-    name := "settings",
+    name := "common",
     commonSettings,
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value
@@ -24,7 +24,7 @@ lazy val collect = project
     )
   )
   .dependsOn(
-    settings
+    common
   )
 
 lazy val migration = project
