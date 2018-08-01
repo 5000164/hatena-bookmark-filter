@@ -5,7 +5,7 @@ lazy val common = project
   .settings(
     name := "common",
     commonSettings,
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= commonDependencies ++ Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value
     )
   )
