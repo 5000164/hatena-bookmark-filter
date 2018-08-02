@@ -19,8 +19,7 @@ lazy val collect = project
       "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3",
       "com.softwaremill.sttp" %% "core" % "1.2.1",
       "org.scalactic" %% "scalactic" % "3.0.5",
-      "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-      "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )
   .dependsOn(

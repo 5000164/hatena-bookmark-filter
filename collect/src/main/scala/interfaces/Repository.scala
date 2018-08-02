@@ -31,7 +31,7 @@ class Repository extends LazyLogging {
     val articles = TableQuery[Articles]
     val date = new java.util.Date()
     val insertActions = DBIO.seq(
-      articles += ArticlesRow(0, url, settingsId, true, new Timestamp(date.getTime), new Timestamp(date.getTime))
+      articles += ArticlesRow(0, url, settingsId, false, new Timestamp(date.getTime), new Timestamp(date.getTime))
     )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
