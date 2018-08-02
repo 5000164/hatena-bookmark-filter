@@ -24,6 +24,10 @@ object Application extends App with LazyLogging {
         case Left(e) => logger.error(s"保存処理に失敗 article:$deliveredArticle, settingsId:$settingsId", e)
       }
     }), Duration.Inf)
+  } catch {
+    case e: Throwable =>
+      logger.error("エラー発生", e)
+      throw e
   } finally repository.close()
 
   logger.info("実行終了")
