@@ -21,6 +21,19 @@ class Repository extends LazyLogging {
     db.close()
   }
 
+  /** URL がすでに存在するか判断する。
+    *
+    * @param url 検索する URL
+    * @return 存在したかどうか
+    */
+  def existsUrl(url: String): Boolean = {
+    val articles = TableQuery[Articles]
+    val q = articles.filter(_.url === url).exists
+    val action = q.result
+    val result = db.run(action)
+    Await.result(result, Duration.Inf)
+  }
+
   /** URL を保存する。
     *
     * @param url        保存する URL
@@ -68,18 +81,5 @@ class Repository extends LazyLogging {
             }
         }
     }
-  }
-
-  /** URL がすでに存在するか判断する。
-    *
-    * @param url 検索する URL
-    * @return 存在したかどうか
-    */
-  def existsUrl(url: String): Boolean = {
-    val articles = TableQuery[Articles]
-    val q = articles.filter(_.url === url).exists
-    val action = q.result
-    val result = db.run(action)
-    Await.result(result, Duration.Inf)
   }
 }
