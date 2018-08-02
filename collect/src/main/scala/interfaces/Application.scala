@@ -2,6 +2,7 @@ package interfaces
 
 import com.typesafe.scalalogging.LazyLogging
 import domain.Articles
+import infrastructure.Repository
 import infrastructure.Settings.settings
 
 import scala.concurrent.ExecutionContext.Implicits.global

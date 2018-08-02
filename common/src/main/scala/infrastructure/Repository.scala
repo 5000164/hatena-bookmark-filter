@@ -1,4 +1,4 @@
-package interfaces
+package infrastructure
 
 import java.sql.Timestamp
 
