@@ -28,6 +28,21 @@ lazy val collect = project
     common
   )
 
+lazy val post = project
+  .settings(
+    name := "post",
+    commonSettings,
+    libraryDependencies ++= commonDependencies ++ Seq(
+      dependencies.sttpCore,
+      dependencies.slackScalaClient,
+      dependencies.scalatest % "test",
+      dependencies.scalactic % "test"
+    )
+  )
+  .dependsOn(
+    common
+  )
+
 lazy val migration = project
   .settings(
     name := "migration",
@@ -54,6 +69,7 @@ lazy val dependencies =
     val scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
     val scalactic = "org.scalactic" %% "scalactic" % "3.0.5"
     val flywayCore = "org.flywaydb" % "flyway-core" % "5.1.4"
+    val slackScalaClient = "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
   }
 
 lazy val commonDependencies = Seq(
