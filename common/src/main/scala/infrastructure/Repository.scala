@@ -33,14 +33,15 @@ class Repository extends LazyLogging {
     Await.result(result, Duration.Inf)
   }
 
-  /** URL がすでに存在するか判断する。
+  /** 該当の設定に URL がすでに存在するか判断する。
     *
-    * @param url 検索する URL
+    * @param url        検索する URL
+    * @param settingsId ウォッチの設定を行っている ID
     * @return 存在したかどうか
     */
-  def existsUrl(url: String): Boolean = {
+  def existsUrl(url: String, settingsId: Byte): Boolean = {
     val articles = TableQuery[Articles]
-    val q = articles.filter(_.url === url).exists
+    val q = articles.filter(r => (r.url === url) && (r.settingsId === settingsId)).exists
     val action = q.result
     val result = db.run(action)
     Await.result(result, Duration.Inf)

@@ -19,7 +19,7 @@ object Application extends App with LazyLogging {
       (settingsId, watchSettings) <- settings.watches
       deliveredArticle <- Articles.fetchDeliveredArticles(watchSettings.feedUrl, Client.fetchContent)
     } yield Future {
-      if (!repository.existsUrl(deliveredArticle.url)) repository.save(deliveredArticle.url, settingsId) match {
+      if (!repository.existsUrl(deliveredArticle.url, settingsId)) repository.save(deliveredArticle.url, settingsId) match {
         case Right(_) =>
         case Left(e) => logger.error(s"保存処理に失敗 article:$deliveredArticle, settingsId:$settingsId", e)
       }
