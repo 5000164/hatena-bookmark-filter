@@ -18,7 +18,7 @@ object Application extends App with LazyLogging {
     Await.ready(Future.sequence(for {
       (url, settingsId) <- repository.fetchAllUnposted()
     } yield Future {
-      val title = "" // TODO: タイトルを投稿するようにする
+      val title = Client.fetchTitle(url)
       val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url) // TODO: 取得したブックマーク数で絞り込むようにする
       val watchSettings = settings.watches(settingsId)
       val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
