@@ -35,6 +35,7 @@ lazy val post = project
     libraryDependencies ++= commonDependencies ++ Seq(
       dependencies.sttpCore,
       dependencies.slackScalaClient,
+      dependencies.scalaScraper,
       dependencies.scalatest % "test",
       dependencies.scalactic % "test"
     )
@@ -70,6 +71,7 @@ lazy val dependencies =
     val scalactic = "org.scalactic" %% "scalactic" % "3.0.5"
     val flywayCore = "org.flywaydb" % "flyway-core" % "5.1.4"
     val slackScalaClient = "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
+    val scalaScraper = "net.ruippeixotog" %% "scala-scraper" % "2.1.0"
   }
 
 lazy val commonDependencies = Seq(
