@@ -17,10 +17,10 @@ object Application extends App with LazyLogging {
   try {
     for {
       unpostedList <- repository.fetchAllUnposted().grouped(settings.parallelPostCount)
-    }
-      Await.ready(Future.sequence(for {
-        (url, settingsId) <- unpostedList
-      } yield Future {
+    } Await.ready(Future.sequence(for {
+      (url, settingsId) <- unpostedList
+    } yield {
+      val f = Future {
         val title = Client.fetchTitle(url)
         val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url) // TODO: 取得したブックマーク数で絞り込むようにする
         val watchSettings = settings.watches(settingsId)
@@ -31,7 +31,10 @@ object Application extends App with LazyLogging {
             case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
           }
         }
-      }), Duration.Inf)
+      }
+      f.failed.foreach(e => logger.error("エラー発生", e))
+      f
+    }), Duration.Inf)
   } catch {
     case e: Throwable =>
       logger.error("エラー発生", e)
