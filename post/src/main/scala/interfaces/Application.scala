@@ -22,10 +22,14 @@ object Application extends App with LazyLogging {
     } yield {
       val f = Future {
         val title = Client.fetchTitle(url)
-        val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url) // TODO: 取得したブックマーク数で絞り込むようにする
+        val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url)
         val watchSettings = settings.watches(settingsId)
-        val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-        Slack.post(settings.slackToken, article).toOption.foreach { _ =>
+        (if (bookmarkCount >= watchSettings.threshold) {
+          val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
+          Slack.post(settings.slackToken, article)
+        } else {
+          Right("")
+        }).toOption.foreach { _ =>
           repository.posted(url, settingsId) match {
             case Right(_) =>
             case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
