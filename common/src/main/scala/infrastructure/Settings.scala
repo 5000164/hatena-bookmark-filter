@@ -12,6 +12,7 @@ object Settings {
 trait SettingsType {
   val watches: Map[Byte, WatchSettings]
   val slackToken: String
+  val parallelPostCount: Int
 }
 
 case class WatchSettings(

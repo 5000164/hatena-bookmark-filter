@@ -19,4 +19,5 @@ new SettingsType {
         iconEmoji = ":+1:")
     ))
   override val slackToken: String = "SLACK_TOKEN"
+  override val parallelPostCount: Int = 10
 }
