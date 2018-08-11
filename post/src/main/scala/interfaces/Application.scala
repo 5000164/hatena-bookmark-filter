@@ -16,9 +16,9 @@ object Application extends App with LazyLogging {
   val repository = new Repository()
   try {
     for {
-      unpostedList <- repository.fetchAllUnposted().grouped(settings.parallelPostCount)
+      unprocessedList <- repository.fetchAllUnprocessed().grouped(settings.parallelPostCount)
     } Await.ready(Future.sequence(for {
-      (url, settingsId) <- unpostedList
+      (url, settingsId) <- unprocessedList
     } yield {
       val f = Future {
         val title = Client.fetchTitle(url)
@@ -30,7 +30,7 @@ object Application extends App with LazyLogging {
         } else {
           Right("")
         }).toOption.foreach { _ =>
-          repository.posted(url, settingsId) match {
+          repository.processed(url, settingsId) match {
             case Right(_) =>
             case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
           }

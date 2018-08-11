@@ -21,13 +21,13 @@ class Repository extends LazyLogging {
     db.close()
   }
 
-  /** まだ投稿していない記事を取得する。
+  /** まだ処理していない記事を取得する。
     *
-    * @return まだ投稿していない記事の一覧
+    * @return まだ処理していない記事の一覧
     */
-  def fetchAllUnposted(): Seq[(String, Byte)] = {
+  def fetchAllUnprocessed(): Seq[(String, Byte)] = {
     val articles = TableQuery[Articles]
-    val q = articles.filter(_.posted === false).map(t => (t.url, t.settingsId))
+    val q = articles.filter(_.processed === false).map(t => (t.url, t.settingsId))
     val action = q.result
     val result = db.run(action)
     Await.result(result, Duration.Inf)
@@ -96,16 +96,16 @@ class Repository extends LazyLogging {
     }
   }
 
-  /** 投稿した記事を投稿済みとしてマークする。
+  /** 処理した記事を処理済みとしてマークする。
     *
-    * @param url        すでに投稿した記事の URL
-    * @param settingsId すでに投稿した記事の設定 ID
+    * @param url        すでに処理した記事の URL
+    * @param settingsId すでに処理した記事の設定 ID
     * @return 実行結果
     */
-  def posted(url: String, settingsId: Byte): Either[Throwable, Unit] = {
+  def processed(url: String, settingsId: Byte): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val date = new java.util.Date()
-    val q = for {a <- articles if a.url === url && a.settingsId === settingsId} yield (a.posted, a.updatedAt)
+    val q = for {a <- articles if a.url === url && a.settingsId === settingsId} yield (a.processed, a.updatedAt)
     val updateAction = q.update(true, new Timestamp(date.getTime))
 
     try {
