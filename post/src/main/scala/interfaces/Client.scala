@@ -13,7 +13,13 @@ object Client {
     */
   def fetchTitle(url: String): String = {
     val browser = JsoupBrowser()
-    val doc = browser.get(url)
-    doc >> text("title")
+    try {
+      val doc = browser.get(url)
+      doc >> text("title")
+    } catch {
+      // タイトルが取得できなかった場合はタイトルなしのまま処理を続ける
+      case _: javax.net.ssl.SSLHandshakeException => ""
+      case _: org.jsoup.HttpStatusException => ""
+    }
   }
 }
