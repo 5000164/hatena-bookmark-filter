@@ -1,6 +1,9 @@
 package domain
 
-import interfaces.HatenaBookmark
+import java.util.Date
+
+import infrastructure.WatchSettings
+import interfaces.{Client, HatenaBookmark}
 
 /** 記事を表現する。
   *
@@ -52,4 +55,26 @@ object Article {
       postChannelId: String,
       userName: String,
       iconEmoji: String): Article = new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
+
+  /** 条件を満たしていた場合に記事情報を構築する。
+    *
+    * @param url           記事の構築とブックマーク数の判定に使用する
+    * @param watchSettings 記事の構築と判定条件の取得に使用する
+    * @param createdAt     対象の URL が保存されてから指定した時間後に判定するために URL が保存された日時を使用する
+    * @return 条件を満たしていた場合のみ記事情報
+    */
+  def buildIfQualified(url: String, watchSettings: WatchSettings, createdAt: Date): Option[Article] = {
+    val point = new Date(new Date().getTime - (watchSettings.waitSecond * 1000))
+    if (createdAt.before(point)) {
+      val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url)
+      if (bookmarkCount >= watchSettings.threshold) {
+        val title = Client.fetchTitle(url)
+        Some(Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji))
+      } else {
+        None
+      }
+    } else {
+      None
+    }
+  }
 }

@@ -1,6 +1,7 @@
 package infrastructure
 
 import java.sql.Timestamp
+import java.util.Date
 
 import com.typesafe.scalalogging.LazyLogging
 import infrastructure.Tables.{Articles, ArticlesRow}
@@ -25,12 +26,11 @@ class Repository extends LazyLogging {
     *
     * @return まだ処理していない記事の一覧
     */
-  def fetchAllUnprocessed(): Seq[(String, Byte)] = {
+  def fetchAllUnprocessed(): Seq[(String, Byte, Date)] = {
     val articles = TableQuery[Articles]
-    val q = articles.filter(_.processed === false).map(t => (t.url, t.settingsId))
-    val action = q.result
-    val result = db.run(action)
-    Await.result(result, Duration.Inf)
+    val query = articles.filter(_.processed === false).map(t => (t.url, t.settingsId, t.createdAt))
+    val result = Await.result(db.run(query.result), Duration.Inf)
+    result.map(r => (r._1, r._2, new Date(r._3.getTime)))
   }
 
   /** 該当の設定に URL がすでに存在するか判断する。
