@@ -56,9 +56,13 @@ class Repository extends LazyLogging {
   def save(url: String, settingsId: Byte): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val date = new java.util.Date()
-    val insertActions = DBIO.seq(
-      articles += ArticlesRow(0, url, settingsId, false, new Timestamp(date.getTime), new Timestamp(date.getTime))
-    )
+    val insertActions = DBIO.seq(articles += ArticlesRow(
+      id = 0,
+      url = url,
+      settingsId = settingsId,
+      processed = false,
+      createdAt = new Timestamp(date.getTime),
+      updatedAt = new Timestamp(date.getTime)))
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
