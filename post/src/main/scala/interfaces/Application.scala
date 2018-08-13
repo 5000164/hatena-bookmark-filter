@@ -1,5 +1,7 @@
 package interfaces
 
+import java.time.LocalDateTime
+
 import com.typesafe.scalalogging.LazyLogging
 import domain.Article
 import infrastructure.Repository
@@ -15,13 +17,17 @@ object Application extends App with LazyLogging {
 
   val repository = new Repository()
   try {
+    val now = LocalDateTime.now()
     for {
       unprocessedList <- repository.fetchAllUnprocessed().grouped(settings.parallelPostCount)
     } Await.ready(Future.sequence(for {
       (url, settingsId, createdAt) <- unprocessedList
     } yield {
       val f = Future {
-        Article.buildIfQualified(url, settings.watches(settingsId), createdAt).foreach { article =>
+        val watchSettings = settings.watches(settingsId)
+        Article.refine(url, now, createdAt, watchSettings.waitSeconds, HatenaBookmark.fetchBookmarkCount, watchSettings.threshold).foreach { bookmarkCount =>
+          val title = Client.fetchTitle(url)
+          val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
           Slack.post(settings.slackToken, article).toOption.foreach { _ =>
             repository.processed(url, settingsId) match {
               case Right(_) =>

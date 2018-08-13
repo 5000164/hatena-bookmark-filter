@@ -2,8 +2,7 @@ package domain
 
 import java.time.LocalDateTime
 
-import infrastructure.WatchSettings
-import interfaces.{Client, HatenaBookmark}
+import interfaces.HatenaBookmark
 
 /** 記事を表現する。
   *
@@ -56,21 +55,25 @@ object Article {
       userName: String,
       iconEmoji: String): Article = new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
 
-  /** 条件を満たしていた場合に記事情報を構築する。
+  /** 条件を満たしているものだけに絞り込む。
     *
-    * @param url           記事の構築とブックマーク数の判定に使用する
-    * @param watchSettings 記事の構築と判定条件の取得に使用する
-    * @param createdAt     対象の URL が保存されてから指定した時間後に判定するために URL が保存された日時を使用する
-    * @return 条件を満たしていた場合のみ記事情報
+    * ブックマーク数は投稿する時にも使用するので 2 回取得しなくてもいいように判定のために取得した値を返す。
+    *
+    * @param url                対象の URL
+    * @param now                現在日時
+    * @param createdAt          対象の URL が保存された日時
+    * @param waitSeconds        URL を保存してから投稿するまでの待ち時間
+    * @param fetchBookmarkCount 対象の URL のブックマーク数を取得する処理
+    * @param threshold          しきい値となるブックマーク数
+    * @return 絞り込んだ結果
     */
-  def buildIfQualified(url: String, watchSettings: WatchSettings, createdAt: LocalDateTime): Option[Article] = {
+  def refine(url: String, now: LocalDateTime, createdAt: LocalDateTime, waitSeconds: Int, fetchBookmarkCount: String => Int, threshold: Int): Option[Int] = {
     // 指定した時間分を経過した記事だけ対象にする
-    if (createdAt.isBefore(LocalDateTime.now().minusSeconds(watchSettings.waitSeconds))) {
-      val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url)
+    if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
+      val bookmarkCount = fetchBookmarkCount(url)
       // 指定したブックマーク数を超えた記事だけ対象にする
-      if (bookmarkCount >= watchSettings.threshold) {
-        val title = Client.fetchTitle(url)
-        Some(Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji))
+      if (bookmarkCount >= threshold) {
+        Some(bookmarkCount)
       } else {
         None
       }
