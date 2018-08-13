@@ -64,8 +64,10 @@ object Article {
     * @return 条件を満たしていた場合のみ記事情報
     */
   def buildIfQualified(url: String, watchSettings: WatchSettings, createdAt: LocalDateTime): Option[Article] = {
+    // 指定した時間分を経過した記事だけ対象にする
     if (createdAt.isBefore(LocalDateTime.now().minusSeconds(watchSettings.waitSeconds))) {
       val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url)
+      // 指定したブックマーク数を超えた記事だけ対象にする
       if (bookmarkCount >= watchSettings.threshold) {
         val title = Client.fetchTitle(url)
         Some(Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji))
