@@ -1,6 +1,6 @@
 package domain
 
-import java.util.Date
+import java.time.LocalDateTime
 
 import infrastructure.WatchSettings
 import interfaces.{Client, HatenaBookmark}
@@ -63,9 +63,8 @@ object Article {
     * @param createdAt     対象の URL が保存されてから指定した時間後に判定するために URL が保存された日時を使用する
     * @return 条件を満たしていた場合のみ記事情報
     */
-  def buildIfQualified(url: String, watchSettings: WatchSettings, createdAt: Date): Option[Article] = {
-    val point = new Date(new Date().getTime - (watchSettings.waitSecond * 1000))
-    if (createdAt.before(point)) {
+  def buildIfQualified(url: String, watchSettings: WatchSettings, createdAt: LocalDateTime): Option[Article] = {
+    if (createdAt.isBefore(LocalDateTime.now().minusSeconds(watchSettings.waitSeconds))) {
       val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url)
       if (bookmarkCount >= watchSettings.threshold) {
         val title = Client.fetchTitle(url)
