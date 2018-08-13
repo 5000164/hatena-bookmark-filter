@@ -24,14 +24,15 @@ object Application extends App with LazyLogging {
       (url, settingsId, createdAt) <- unprocessedList
     } yield {
       val f = Future {
-        val watchSettings = settings.watches(settingsId)
-        Article.refine(url, now, createdAt, watchSettings.waitSeconds, HatenaBookmark.fetchBookmarkCount, watchSettings.threshold).foreach { bookmarkCount =>
-          val title = Client.fetchTitle(url)
-          val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-          Slack.post(settings.slackToken, article).toOption.foreach { _ =>
-            repository.processed(url, settingsId) match {
-              case Right(_) =>
-              case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
+        settings.watches.get(settingsId).foreach { watchSettings =>
+          Article.refine(url, now, createdAt, watchSettings.waitSeconds, HatenaBookmark.fetchBookmarkCount, watchSettings.threshold).foreach { bookmarkCount =>
+            val title = Client.fetchTitle(url)
+            val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
+            Slack.post(settings.slackToken, article).toOption.foreach { _ =>
+              repository.processed(url, settingsId) match {
+                case Right(_) =>
+                case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
+              }
             }
           }
         }
