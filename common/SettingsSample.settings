@@ -5,6 +5,7 @@ new SettingsType {
     1.toByte -> WatchSettings(
       feedUrl = "http://b.hatena.ne.jp/hotentry/all.rss",
       threshold = 500,
+      waitSeconds = 604800,
       slack = SlackSettings(
         postChannelId = "#channel_id",
         userName = "USER NAME",
@@ -13,6 +14,7 @@ new SettingsType {
     2.toByte -> WatchSettings(
       feedUrl = "http://b.hatena.ne.jp/hotentry/it.rss",
       threshold = 100,
+      waitSeconds = 86400,
       slack = SlackSettings(
         postChannelId = "#channel_id",
         userName = "USER NAME",

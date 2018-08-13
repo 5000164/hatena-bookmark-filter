@@ -1,5 +1,7 @@
 package interfaces
 
+import java.time.LocalDateTime
+
 import com.typesafe.scalalogging.LazyLogging
 import domain.Article
 import infrastructure.Repository
@@ -15,24 +17,23 @@ object Application extends App with LazyLogging {
 
   val repository = new Repository()
   try {
+    val now = LocalDateTime.now()
     for {
-      unpostedList <- repository.fetchAllUnposted().grouped(settings.parallelPostCount)
+      unprocessedList <- repository.fetchAllUnprocessed().grouped(settings.parallelPostCount)
     } Await.ready(Future.sequence(for {
-      (url, settingsId) <- unpostedList
+      (url, settingsId, createdAt) <- unprocessedList
     } yield {
       val f = Future {
-        val title = Client.fetchTitle(url)
-        val bookmarkCount = HatenaBookmark.fetchBookmarkCount(url)
-        val watchSettings = settings.watches(settingsId)
-        (if (bookmarkCount >= watchSettings.threshold) {
-          val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-          Slack.post(settings.slackToken, article)
-        } else {
-          Right("")
-        }).toOption.foreach { _ =>
-          repository.posted(url, settingsId) match {
-            case Right(_) =>
-            case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
+        settings.watches.get(settingsId).foreach { watchSettings =>
+          Article.refine(url, now, createdAt, watchSettings.waitSeconds, HatenaBookmark.fetchBookmarkCount, watchSettings.threshold).foreach { bookmarkCount =>
+            val title = Client.fetchTitle(url)
+            val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
+            Slack.post(settings.slackToken, article).toOption.foreach { _ =>
+              repository.processed(url, settingsId) match {
+                case Right(_) =>
+                case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
+              }
+            }
           }
         }
       }

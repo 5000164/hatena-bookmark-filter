@@ -1,6 +1,7 @@
 package infrastructure
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 import com.typesafe.scalalogging.LazyLogging
 import infrastructure.Tables.{Articles, ArticlesRow}
@@ -21,16 +22,15 @@ class Repository extends LazyLogging {
     db.close()
   }
 
-  /** まだ投稿していない記事を取得する。
+  /** まだ処理していない記事を取得する。
     *
-    * @return まだ投稿していない記事の一覧
+    * @return まだ処理していない記事の一覧
     */
-  def fetchAllUnposted(): Seq[(String, Byte)] = {
+  def fetchAllUnprocessed(): Seq[(String, Byte, LocalDateTime)] = {
     val articles = TableQuery[Articles]
-    val q = articles.filter(_.posted === false).map(t => (t.url, t.settingsId))
-    val action = q.result
-    val result = db.run(action)
-    Await.result(result, Duration.Inf)
+    val query = articles.filter(_.processed === false).map(t => (t.url, t.settingsId, t.createdAt))
+    val result = Await.result(db.run(query.result), Duration.Inf)
+    result.map(r => (r._1, r._2, r._3.toLocalDateTime))
   }
 
   /** 該当の設定に URL がすでに存在するか判断する。
@@ -56,9 +56,13 @@ class Repository extends LazyLogging {
   def save(url: String, settingsId: Byte): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val date = new java.util.Date()
-    val insertActions = DBIO.seq(
-      articles += ArticlesRow(0, url, settingsId, false, new Timestamp(date.getTime), new Timestamp(date.getTime))
-    )
+    val insertActions = DBIO.seq(articles += ArticlesRow(
+      id = 0,
+      url = url,
+      settingsId = settingsId,
+      processed = false,
+      createdAt = new Timestamp(date.getTime),
+      updatedAt = new Timestamp(date.getTime)))
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
@@ -96,16 +100,16 @@ class Repository extends LazyLogging {
     }
   }
 
-  /** 投稿した記事を投稿済みとしてマークする。
+  /** 処理した記事を処理済みとしてマークする。
     *
-    * @param url        すでに投稿した記事の URL
-    * @param settingsId すでに投稿した記事の設定 ID
+    * @param url        すでに処理した記事の URL
+    * @param settingsId すでに処理した記事の設定 ID
     * @return 実行結果
     */
-  def posted(url: String, settingsId: Byte): Either[Throwable, Unit] = {
+  def processed(url: String, settingsId: Byte): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val date = new java.util.Date()
-    val q = for {a <- articles if a.url === url && a.settingsId === settingsId} yield (a.posted, a.updatedAt)
+    val q = for {a <- articles if a.url === url && a.settingsId === settingsId} yield (a.processed, a.updatedAt)
     val updateAction = q.update(true, new Timestamp(date.getTime))
 
     try {

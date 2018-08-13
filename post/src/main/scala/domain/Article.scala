@@ -1,5 +1,7 @@
 package domain
 
+import java.time.LocalDateTime
+
 import interfaces.HatenaBookmark
 
 /** 記事を表現する。
@@ -52,4 +54,31 @@ object Article {
       postChannelId: String,
       userName: String,
       iconEmoji: String): Article = new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
+
+  /** 条件を満たしているものだけに絞り込む。
+    *
+    * ブックマーク数は投稿する時にも使用するので 2 回取得しなくてもいいように判定のために取得した値を返す。
+    *
+    * @param url                対象の URL
+    * @param now                現在日時
+    * @param createdAt          対象の URL が保存された日時
+    * @param waitSeconds        URL を保存してから投稿するまでの待ち時間
+    * @param fetchBookmarkCount 対象の URL のブックマーク数を取得する処理
+    * @param threshold          しきい値となるブックマーク数
+    * @return 絞り込んだ結果
+    */
+  def refine(url: String, now: LocalDateTime, createdAt: LocalDateTime, waitSeconds: Int, fetchBookmarkCount: String => Int, threshold: Int): Option[Int] = {
+    // 指定した時間分を経過した記事だけ対象にする
+    if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
+      val bookmarkCount = fetchBookmarkCount(url)
+      // 指定したブックマーク数を超えた記事だけ対象にする
+      if (bookmarkCount >= threshold) {
+        Some(bookmarkCount)
+      } else {
+        None
+      }
+    } else {
+      None
+    }
+  }
 }

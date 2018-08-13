@@ -22,10 +22,10 @@ trait Tables {
    *  @param id Database column ID SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param url Database column URL SqlType(VARCHAR)
    *  @param settingsId Database column SETTINGS_ID SqlType(TINYINT)
-   *  @param posted Database column POSTED SqlType(BOOLEAN)
+   *  @param processed Database column PROCESSED SqlType(BOOLEAN)
    *  @param createdAt Database column CREATED_AT SqlType(TIMESTAMP)
    *  @param updatedAt Database column UPDATED_AT SqlType(TIMESTAMP) */
-  case class ArticlesRow(id: Long, url: String, settingsId: Byte, posted: Boolean, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
+  case class ArticlesRow(id: Long, url: String, settingsId: Byte, processed: Boolean, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
   /** GetResult implicit for fetching ArticlesRow objects using plain SQL queries */
   implicit def GetResultArticlesRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Byte], e3: GR[Boolean], e4: GR[java.sql.Timestamp]): GR[ArticlesRow] = GR{
     prs => import prs._
@@ -33,9 +33,9 @@ trait Tables {
   }
   /** Table description of table ARTICLES. Objects of this class serve as prototypes for rows in queries. */
   class Articles(_tableTag: Tag) extends profile.api.Table[ArticlesRow](_tableTag, "ARTICLES") {
-    def * = (id, url, settingsId, posted, createdAt, updatedAt) <> (ArticlesRow.tupled, ArticlesRow.unapply)
+    def * = (id, url, settingsId, processed, createdAt, updatedAt) <> (ArticlesRow.tupled, ArticlesRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(url), Rep.Some(settingsId), Rep.Some(posted), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> ArticlesRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(url), Rep.Some(settingsId), Rep.Some(processed), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> ArticlesRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column ID SqlType(BIGINT), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("ID", O.AutoInc, O.PrimaryKey)
@@ -43,8 +43,8 @@ trait Tables {
     val url: Rep[String] = column[String]("URL")
     /** Database column SETTINGS_ID SqlType(TINYINT) */
     val settingsId: Rep[Byte] = column[Byte]("SETTINGS_ID")
-    /** Database column POSTED SqlType(BOOLEAN) */
-    val posted: Rep[Boolean] = column[Boolean]("POSTED")
+    /** Database column PROCESSED SqlType(BOOLEAN) */
+    val processed: Rep[Boolean] = column[Boolean]("PROCESSED")
     /** Database column CREATED_AT SqlType(TIMESTAMP) */
     val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("CREATED_AT")
     /** Database column UPDATED_AT SqlType(TIMESTAMP) */

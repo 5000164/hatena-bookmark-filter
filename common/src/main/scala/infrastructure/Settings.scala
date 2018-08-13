@@ -18,6 +18,7 @@ trait SettingsType {
 case class WatchSettings(
     feedUrl: String,
     threshold: Int,
+    waitSeconds: Int,
     slack: SlackSettings)
 
 case class SlackSettings(
