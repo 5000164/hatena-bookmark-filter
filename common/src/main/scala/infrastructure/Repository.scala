@@ -108,7 +108,7 @@ class Repository extends LazyLogging {
   def markProcessed(id: Long): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
     val q = for {a <- articles if a.id === id} yield (a.processed, a.updatedAt)
-    val updateAction = q.update(true, new Timestamp(System.currentTimeMillis()))
+    val updateAction = q.update((true, new Timestamp(System.currentTimeMillis())))
 
     try {
       Right(Await.result(db.run(updateAction), Duration.Inf))
