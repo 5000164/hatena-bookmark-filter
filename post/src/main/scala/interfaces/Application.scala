@@ -13,7 +13,7 @@ import scala.concurrent.{Await, Future}
 
 /** アプリを起動する。 */
 object Application extends App with LazyLogging {
-  logger.info("実行開始")
+  logger.info("post 実行開始")
 
   val repository = new Repository()
   try {
@@ -52,5 +52,5 @@ object Application extends App with LazyLogging {
       throw e
   } finally repository.close()
 
-  logger.info("実行終了")
+  logger.info("post 実行終了")
 }
