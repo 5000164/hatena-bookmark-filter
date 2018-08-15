@@ -3,7 +3,7 @@ package interfaces
 import java.time.LocalDateTime
 
 import com.typesafe.scalalogging.LazyLogging
-import domain.Article
+import domain.{Article, NotQualified, Qualified, Still}
 import infrastructure.Repository
 import infrastructure.Settings.settings
 
@@ -25,14 +25,20 @@ object Application extends App with LazyLogging {
     } yield {
       val f = Future {
         settings.watches.get(settingsId).foreach { watchSettings =>
-          Article.refine(url, now, createdAt, watchSettings.waitSeconds, HatenaBookmark.fetchBookmarkCount, watchSettings.threshold).foreach { bookmarkCount =>
-            val title = Client.fetchTitle(url)
-            val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-            Slack.post(settings.slackToken, article).toOption.foreach { _ =>
-              repository.markProcessed(id) match {
-                case Right(_) =>
-                case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
-              }
+          (Article.judge(url, now, createdAt, watchSettings.waitSeconds, HatenaBookmark.fetchBookmarkCount, watchSettings.threshold) match {
+            case (Qualified, Some(bookmarkCount)) =>
+              val title = Client.fetchTitle(url)
+              val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
+              Slack.post(settings.slackToken, article).toOption
+            case (NotQualified, None) => Some("")
+            case (Still, None) => None
+            case _ =>
+              logger.error("想定していない値")
+              None
+          }).foreach { _ =>
+            repository.markProcessed(id) match {
+              case Right(_) =>
+              case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
             }
           }
         }

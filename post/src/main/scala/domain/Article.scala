@@ -55,7 +55,7 @@ object Article {
       userName: String,
       iconEmoji: String): Article = new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
 
-  /** 条件を満たしているものだけに絞り込む。
+  /** 対象の URL を条件に応じて結果を判定する。
     *
     * ブックマーク数は投稿する時にも使用するので 2 回取得しなくてもいいように判定のために取得した値を返す。
     *
@@ -65,20 +65,28 @@ object Article {
     * @param waitSeconds        URL を保存してから投稿するまでの待ち時間
     * @param fetchBookmarkCount 対象の URL のブックマーク数を取得する処理
     * @param threshold          しきい値となるブックマーク数
-    * @return 絞り込んだ結果
+    * @return 条件に応じた結果
     */
-  def refine(url: String, now: LocalDateTime, createdAt: LocalDateTime, waitSeconds: Int, fetchBookmarkCount: String => Int, threshold: Int): Option[Int] = {
+  def judge(url: String, now: LocalDateTime, createdAt: LocalDateTime, waitSeconds: Int, fetchBookmarkCount: String => Int, threshold: Int): (JudgeType, Option[Int]) = {
     // 指定した時間分を経過した記事だけ対象にする
     if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
       val bookmarkCount = fetchBookmarkCount(url)
       // 指定したブックマーク数を超えた記事だけ対象にする
       if (bookmarkCount >= threshold) {
-        Some(bookmarkCount)
+        (Qualified, Some(bookmarkCount))
       } else {
-        None
+        (NotQualified, None)
       }
     } else {
-      None
+      (Still, None)
     }
   }
 }
+
+sealed trait JudgeType
+
+case object Qualified extends JudgeType
+
+case object NotQualified extends JudgeType
+
+case object Still extends JudgeType
