@@ -2,7 +2,7 @@ package domain
 
 import java.time.LocalDateTime
 
-import domain.Article.refine
+import domain.Article.judge
 import org.scalatest.FeatureSpec
 
 class ArticleSpec extends FeatureSpec {
@@ -22,55 +22,45 @@ class ArticleSpec extends FeatureSpec {
     }
   }
 
-  feature("URL を絞り込むことができる") {
-    scenario("指定した時間を経過していない場合は None になる") {
-      assert(refine(
+  feature("URL の状態に応じて結果を判定することができる") {
+    scenario("指定した時間を経過していない場合は Still になる") {
+      assert(judge(
         url = "",
         now = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
         createdAt = LocalDateTime.of(2017, 12, 31, 23, 59, 59),
         waitSeconds = 1,
         fetchBookmarkCount = _ => 0,
-        threshold = 0) === None)
+        threshold = 0) === (Still, None))
     }
 
-    scenario("指定した時間を経過している場合は Some になる") {
-      assert(refine(
+    scenario("指定した時間を経過していてブックマーク数がしきい値を下回っている場合は NotQualified になる") {
+      assert(judge(
         url = "",
         now = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
         createdAt = LocalDateTime.of(2017, 12, 31, 23, 59, 59),
         waitSeconds = 0,
-        fetchBookmarkCount = _ => 0,
-        threshold = 0) === Some(0))
-    }
-
-    scenario("ブックマーク数がしきい値を下回っている場合は None になる") {
-      assert(refine(
-        url = "",
-        now = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
-        createdAt = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
-        waitSeconds = 0,
         fetchBookmarkCount = _ => 1,
-        threshold = 2) === None)
+        threshold = 2) === (NotQualified, None))
     }
 
-    scenario("ブックマーク数がしきい値と同じ場合は Some になる") {
-      assert(refine(
+    scenario("指定した時間を経過していてブックマーク数がしきい値と同じ場合は Qualified になる") {
+      assert(judge(
         url = "",
         now = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
-        createdAt = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
+        createdAt = LocalDateTime.of(2017, 12, 31, 23, 59, 59),
         waitSeconds = 0,
         fetchBookmarkCount = _ => 2,
-        threshold = 2) === None)
+        threshold = 2) === (Qualified, Some(2)))
     }
 
-    scenario("ブックマーク数がしきい値を上回っている場合は Some になる") {
-      assert(refine(
+    scenario("指定した時間を経過していてブックマーク数がしきい値を上回っている場合は Qualified になる") {
+      assert(judge(
         url = "",
         now = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
-        createdAt = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
+        createdAt = LocalDateTime.of(2017, 12, 31, 23, 59, 59),
         waitSeconds = 0,
         fetchBookmarkCount = _ => 3,
-        threshold = 2) === None)
+        threshold = 2) === (Qualified, Some(3)))
     }
   }
 }

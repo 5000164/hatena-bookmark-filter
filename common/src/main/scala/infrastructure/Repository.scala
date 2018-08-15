@@ -26,11 +26,11 @@ class Repository extends LazyLogging {
     *
     * @return まだ処理していない記事の一覧
     */
-  def fetchAllUnprocessed(): Seq[(String, Byte, LocalDateTime)] = {
+  def fetchAllUnprocessed(): Seq[(Long, String, Byte, LocalDateTime)] = {
     val articles = TableQuery[Articles]
-    val query = articles.filter(_.processed === false).map(t => (t.url, t.settingsId, t.createdAt))
+    val query = articles.filter(_.processed === false).map(t => (t.id, t.url, t.settingsId, t.createdAt))
     val result = Await.result(db.run(query.result), Duration.Inf)
-    result.map(r => (r._1, r._2, r._3.toLocalDateTime))
+    result.map(r => (r._1, r._2, r._3, r._4.toLocalDateTime))
   }
 
   /** 該当の設定に URL がすでに存在するか判断する。
@@ -102,45 +102,43 @@ class Repository extends LazyLogging {
 
   /** 処理した記事を処理済みとしてマークする。
     *
-    * @param url        すでに処理した記事の URL
-    * @param settingsId すでに処理した記事の設定 ID
+    * @param id すでに処理した記事の ID
     * @return 実行結果
     */
-  def processed(url: String, settingsId: Byte): Either[Throwable, Unit] = {
+  def markProcessed(id: Long): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
-    val date = new java.util.Date()
-    val q = for {a <- articles if a.url === url && a.settingsId === settingsId} yield (a.processed, a.updatedAt)
-    val updateAction = q.update(true, new Timestamp(date.getTime))
+    val q = for {a <- articles if a.id === id} yield (a.processed, a.updatedAt)
+    val updateAction = q.update((true, new Timestamp(System.currentTimeMillis())))
 
     try {
       Right(Await.result(db.run(updateAction), Duration.Inf))
     } catch {
       case NonFatal(e1) =>
-        logger.info(s"保存失敗 1 回目 $url", e1)
+        logger.info(s"保存失敗 1 回目 $id", e1)
         Thread.sleep((Random.nextInt(91) + 10) * 100)
         try {
           Right(Await.result(db.run(updateAction), Duration.Inf))
         } catch {
           case NonFatal(e2) =>
-            logger.info(s"保存失敗 2 回目 $url", e2)
+            logger.info(s"保存失敗 2 回目 $id", e2)
             Thread.sleep((Random.nextInt(91) + 10) * 100)
             try {
               Right(Await.result(db.run(updateAction), Duration.Inf))
             } catch {
               case NonFatal(e3) =>
-                logger.info(s"保存失敗 3 回目 $url", e3)
+                logger.info(s"保存失敗 3 回目 $id", e3)
                 Thread.sleep((Random.nextInt(91) + 10) * 100)
                 try {
                   Right(Await.result(db.run(updateAction), Duration.Inf))
                 } catch {
                   case NonFatal(e4) =>
-                    logger.info(s"保存失敗 4 回目 $url", e4)
+                    logger.info(s"保存失敗 4 回目 $id", e4)
                     Thread.sleep((Random.nextInt(91) + 10) * 100)
                     try {
                       Right(Await.result(db.run(updateAction), Duration.Inf))
                     } catch {
                       case NonFatal(e5) =>
-                        logger.info(s"保存失敗 5 回目 $url", e5)
+                        logger.info(s"保存失敗 5 回目 $id", e5)
                         Left(e5)
                     }
                 }
