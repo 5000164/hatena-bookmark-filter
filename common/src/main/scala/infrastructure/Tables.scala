@@ -52,6 +52,8 @@ trait Tables {
 
     /** Uniqueness Index over (url,settingsId) (database name CONSTRAINT_INDEX_E) */
     val index1 = index("CONSTRAINT_INDEX_E", (url, settingsId), unique=true)
+    /** Index over (processed) (database name INDEX_E) */
+    val index2 = index("INDEX_E", processed)
   }
   /** Collection-like TableQuery object for table Articles */
   lazy val Articles = new TableQuery(tag => new Articles(tag))
