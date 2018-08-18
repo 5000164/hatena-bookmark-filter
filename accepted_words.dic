@@ -9,7 +9,6 @@ gilbertw
 typesafe
 hikaricp
 jdbc
-sqlite
-xerial
 flywaydb
 codegen
+ltsv
