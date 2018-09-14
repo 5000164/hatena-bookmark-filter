@@ -1,5 +1,5 @@
 name := "hatena-bookmark-filter"
-version := "2.0.1"
+version := "2.0.2"
 
 lazy val common = project
   .settings(
@@ -34,6 +34,9 @@ lazy val post = project
     commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       dependencies.sttpCore,
+      dependencies.akkaActor,
+      dependencies.akkaStream,
+      dependencies.akkaSlf4j,
       dependencies.slackScalaClient,
       dependencies.scalaScraper,
       dependencies.scalatest % "test",
@@ -70,6 +73,9 @@ lazy val dependencies =
     val scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
     val scalactic = "org.scalactic" %% "scalactic" % "3.0.5"
     val flywayCore = "org.flywaydb" % "flyway-core" % "5.1.4"
+    val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.5.11"
+    val akkaStream = "com.typesafe.akka" %% "akka-stream" % "2.5.11"
+    val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % "2.5.11"
     val slackScalaClient = "com.github.gilbertw1" %% "slack-scala-client" % "0.2.3"
     val scalaScraper = "net.ruippeixotog" %% "scala-scraper" % "2.1.0"
   }
