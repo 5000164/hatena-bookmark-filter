@@ -21,6 +21,7 @@ object Client {
       case _: javax.net.ssl.SSLHandshakeException => ""
       case _: org.jsoup.HttpStatusException => ""
       case _: java.net.UnknownHostException => ""
+      case _: org.jsoup.UnsupportedMimeTypeException => ""
     }
   }
 }
