@@ -29,17 +29,17 @@ object Application extends App with LazyLogging {
             case (Qualified, Some(bookmarkCount)) =>
               val title = Client.fetchTitle(url)
               val article = Article(url, title, bookmarkCount, watchSettings.slack.postChannelId, watchSettings.slack.userName, watchSettings.slack.iconEmoji)
-              Slack.post(settings.slackToken, article).toOption
-            case (NotQualified, None) => Some("")
+              Some(Slack.post(settings.slackToken, article))
+            case (NotQualified, None) => Some(Right(""))
             case (Still, None) => None
-            case _ =>
-              logger.error("想定していない値")
-              None
-          }).foreach { _ =>
-            repository.markProcessed(id) match {
-              case Right(_) =>
-              case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
-            }
+            case _ => Some(Left(new Exception("想定していない値")))
+          }).foreach {
+            case Right(_) =>
+              repository.markProcessed(id) match {
+                case Right(_) =>
+                case Left(e) => logger.error(s"保存処理に失敗 url:$url, settingsId:$settingsId", e)
+              }
+            case Left(e) => logger.error("エラー発生", e)
           }
         }
       }
