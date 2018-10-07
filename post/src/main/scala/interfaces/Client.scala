@@ -18,9 +18,9 @@ object Client {
       doc >> text("title")
     } catch {
       // タイトルが取得できなかった場合はタイトルなしのまま処理を続ける
+      case _: java.net.UnknownHostException => ""
       case _: javax.net.ssl.SSLHandshakeException => ""
       case _: org.jsoup.HttpStatusException => ""
-      case _: java.net.UnknownHostException => ""
       case _: org.jsoup.UnsupportedMimeTypeException => ""
     }
   }
