@@ -20,6 +20,7 @@ object Client {
       // タイトルが取得できなかった場合はタイトルなしのまま処理を続ける
       case _: javax.net.ssl.SSLHandshakeException => ""
       case _: org.jsoup.HttpStatusException => ""
+      case _: java.net.UnknownHostException => ""
     }
   }
 }
