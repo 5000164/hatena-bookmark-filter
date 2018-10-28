@@ -4,6 +4,7 @@ import com.softwaremill.sttp._
 
 /** はてなブックマークに関する処理を行う。 */
 object HatenaBookmark {
+
   /** 対象の URL のはてなブックマーク件数を取得する。
     *
     * @param url 調査する対象の URL
@@ -20,7 +21,11 @@ object HatenaBookmark {
     * @return はてなブックマークコメントページの URL
     */
   def buildCommentUrl(url: String): String = {
-    val connector = if (url(4) == 's') {"s/"} else {""}
+    val connector = if (url(4) == 's') {
+      "s/"
+    } else {
+      ""
+    }
     val path = url.split(':')(1).drop(2)
     s"http://b.hatena.ne.jp/entry/$connector$path"
   }

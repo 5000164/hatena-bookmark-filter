@@ -10,6 +10,7 @@ import scala.util.control.NonFatal
 
 /** Slack に関する処理を行う。 */
 object Slack {
+
   /** 投稿する。
     *
     * @param token   接続する Bot ユーザーのトークン
@@ -17,21 +18,22 @@ object Slack {
     * @return 実行結果
     */
   def post(token: String, article: Article): Either[Throwable, String] = {
-    implicit val system: ActorSystem = ActorSystem("slack")
+    implicit val system: ActorSystem          = ActorSystem("slack")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
-    val client = BlockingSlackApiClient(token)
+    val client                                = BlockingSlackApiClient(token)
     try {
-      Right(client.postChatMessage(
-        channelId = article.postChannelId,
-        text = article.toSlackString,
-        unfurlLinks = Some(true),
-        username = Some(article.userName),
-        iconEmoji = Some(article.iconEmoji)))
-    }
-    catch {
+      Right(
+        client.postChatMessage(
+          channelId = article.postChannelId,
+          text = article.toSlackString,
+          unfurlLinks = Some(true),
+          username = Some(article.userName),
+          iconEmoji = Some(article.iconEmoji)
+        )
+      )
+    } catch {
       case NonFatal(e) => Left(e)
-    }
-    finally {
+    } finally {
       Http().shutdownAllConnectionPools().onComplete { _ =>
         system.terminate
       }

@@ -4,6 +4,7 @@ import scala.xml.{Elem, Node, XML}
 
 /** 記事に関する操作を抽象化して扱う。 */
 object Articles {
+
   /** 配信された記事一覧を取得する。
     *
     * @param feedUrl      抽出元の RSS の URL
@@ -13,13 +14,13 @@ object Articles {
   def fetchDeliveredArticles(feedUrl: String, fetchContent: String => String): Seq[DeliveredArticle] = {
     val getItems = (element: Elem) => element \ "item"
     val getArticle = (node: Node) => {
-      val url = (node \ "link").text
+      val url   = (node \ "link").text
       val title = (node \ "title").text
       DeliveredArticle(url, title)
     }
 
     val xmlString = fetchContent(feedUrl)
-    val xml = XML.loadString(xmlString)
+    val xml       = XML.loadString(xmlString)
     getItems(xml).map(getArticle)
   }
 }
@@ -29,6 +30,4 @@ object Articles {
   * @param url   URL
   * @param title タイトル
   */
-case class DeliveredArticle(
-    url: String,
-    title: String)
+case class DeliveredArticle(url: String, title: String)
