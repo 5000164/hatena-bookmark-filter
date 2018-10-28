@@ -63,7 +63,7 @@ lazy val dependencies =
   new {
     val logback          = "ch.qos.logback"             % "logback-classic"     % "1.2.3"
     val scalaLogging     = "com.typesafe.scala-logging" %% "scala-logging"      % "3.9.0"
-    val scalaCompiler    = "org.scala-lang"             % "scala-compiler"      % "2.12.6"
+    val scalaCompiler    = "org.scala-lang"             % "scala-compiler"      % "2.12.8"
     val scalaXml         = "org.scala-lang.modules"     %% "scala-xml"          % "1.0.6"
     val slick            = "com.typesafe.slick"         %% "slick"              % "3.2.3"
     val slickHikaricp    = "com.typesafe.slick"         %% "slick-hikaricp"     % "3.2.3"
@@ -86,7 +86,7 @@ lazy val commonDependencies = Seq(
 )
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.8",
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
   assemblyJarName in assembly := name.value + ".jar"
 )
