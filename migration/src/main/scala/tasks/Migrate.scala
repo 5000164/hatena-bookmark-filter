@@ -7,9 +7,11 @@ import slick.codegen.SourceCodeGenerator
 object Migrate extends App {
   val url = "jdbc:h2:./db"
 
-  val flyway = new Flyway()
-  flyway.setDataSource(url, "", "")
-  flyway.setLocations(s"filesystem:${System.getProperty("user.dir")}/migration/src/main/resources/db/migration")
+  val flyway = Flyway
+    .configure()
+    .dataSource(url, "", "")
+    .locations(s"filesystem:${System.getProperty("user.dir")}/migration/src/main/resources/db/migration")
+    .load()
   flyway.migrate()
 
   SourceCodeGenerator.main(
