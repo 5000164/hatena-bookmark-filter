@@ -1,5 +1,6 @@
 package domain
 
+import java.net.ConnectException
 import java.time.LocalDateTime
 
 import interfaces.HatenaBookmark
@@ -14,14 +15,7 @@ import interfaces.HatenaBookmark
   * @param userName      Slack での投稿名
   * @param iconEmoji     Slack での表示アイコン
   */
-case class Article(
-    url: String,
-    title: String,
-    bookmarkCount: Int,
-    commentUrl: String,
-    postChannelId: String,
-    userName: String,
-    iconEmoji: String) {
+case class Article(url: String, title: String, bookmarkCount: Int, commentUrl: String, postChannelId: String, userName: String, iconEmoji: String) {
 
   /** Slack への投稿用に整形する。
     *
@@ -36,6 +30,7 @@ case class Article(
 
 /** Article のコンパニオンオブジェクト。 */
 object Article {
+
   /**
     * commentUrl は渡されてから構築する。
     *
@@ -47,13 +42,8 @@ object Article {
     * @param iconEmoji     Slack での表示アイコン
     * @return commentUrl を構築して付与した Article
     */
-  def apply(
-      url: String,
-      title: String,
-      bookmarkCount: Int,
-      postChannelId: String,
-      userName: String,
-      iconEmoji: String): Article = new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
+  def apply(url: String, title: String, bookmarkCount: Int, postChannelId: String, userName: String, iconEmoji: String): Article =
+    new Article(url, title, bookmarkCount, HatenaBookmark.buildCommentUrl(url), postChannelId, userName, iconEmoji)
 
   /** 対象の URL を条件に応じて結果を判定する。
     *
@@ -67,18 +57,34 @@ object Article {
     * @param threshold          しきい値となるブックマーク数
     * @return 条件に応じた結果
     */
-  def judge(url: String, now: LocalDateTime, createdAt: LocalDateTime, waitSeconds: Int, fetchBookmarkCount: String => Int, threshold: Int): (JudgeType, Option[Int]) = {
-    // 指定した時間分を経過した記事だけ対象にする
-    if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
-      val bookmarkCount = fetchBookmarkCount(url)
-      // 指定したブックマーク数を超えた記事だけ対象にする
-      if (bookmarkCount >= threshold) {
-        (Qualified, Some(bookmarkCount))
-      } else {
-        (NotQualified, None)
+  def judge(
+      url: String,
+      now: LocalDateTime,
+      createdAt: LocalDateTime,
+      waitSeconds: Int,
+      fetchBookmarkCount: String => Int,
+      threshold: Int
+  ): (JudgeType, Option[Int]) = {
+    (
+      try {
+        Some(fetchBookmarkCount(url))
+      } catch {
+        case _: ConnectException => None
       }
-    } else {
-      (Still, None)
+    ) match {
+      case Some(bookmarkCount) =>
+        // 指定した時間分を経過した記事だけ対象にする
+        if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
+          // 指定したブックマーク数を超えた記事だけ対象にする
+          if (bookmarkCount >= threshold) {
+            (Qualified, Some(bookmarkCount))
+          } else {
+            (NotQualified, None)
+          }
+        } else {
+          (Still, None)
+        }
+      case None => (Still, None)
     }
   }
 }

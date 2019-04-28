@@ -28,8 +28,8 @@ class Repository extends LazyLogging {
     */
   def fetchAllUnprocessed(): Seq[(Long, String, Byte, LocalDateTime)] = {
     val articles = TableQuery[Articles]
-    val query = articles.filter(_.processed === false).map(t => (t.id, t.url, t.settingsId, t.createdAt))
-    val result = Await.result(db.run(query.result), Duration.Inf)
+    val query    = articles.filter(_.processed === false).map(t => (t.id, t.url, t.settingsId, t.createdAt))
+    val result   = Await.result(db.run(query.result), Duration.Inf)
     result.map(r => (r._1, r._2, r._3, r._4.toLocalDateTime))
   }
 
@@ -41,9 +41,9 @@ class Repository extends LazyLogging {
     */
   def existsUrl(url: String, settingsId: Byte): Boolean = {
     val articles = TableQuery[Articles]
-    val q = articles.filter(r => (r.url === url) && (r.settingsId === settingsId)).exists
-    val action = q.result
-    val result = db.run(action)
+    val q        = articles.filter(r => (r.url === url) && (r.settingsId === settingsId)).exists
+    val action   = q.result
+    val result   = db.run(action)
     Await.result(result, Duration.Inf)
   }
 
@@ -55,14 +55,17 @@ class Repository extends LazyLogging {
     */
   def save(url: String, settingsId: Byte): Either[Throwable, Unit] = {
     val articles = TableQuery[Articles]
-    val date = new java.util.Date()
-    val insertActions = DBIO.seq(articles += ArticlesRow(
-      id = 0,
-      url = url,
-      settingsId = settingsId,
-      processed = false,
-      createdAt = new Timestamp(date.getTime),
-      updatedAt = new Timestamp(date.getTime)))
+    val date     = new java.util.Date()
+    val insertActions = DBIO.seq(
+      articles += ArticlesRow(
+        id = 0,
+        url = url,
+        settingsId = settingsId,
+        processed = false,
+        createdAt = new Timestamp(date.getTime),
+        updatedAt = new Timestamp(date.getTime)
+      )
+    )
     try {
       Right(Await.result(db.run(insertActions.transactionally), Duration.Inf))
     } catch {
@@ -106,8 +109,8 @@ class Repository extends LazyLogging {
     * @return 実行結果
     */
   def markProcessed(id: Long): Either[Throwable, Unit] = {
-    val articles = TableQuery[Articles]
-    val q = for {a <- articles if a.id === id} yield (a.processed, a.updatedAt)
+    val articles     = TableQuery[Articles]
+    val q            = for { a <- articles if a.id === id } yield (a.processed, a.updatedAt)
     val updateAction = q.update((true, new Timestamp(System.currentTimeMillis())))
 
     try {

@@ -6,6 +6,7 @@ import net.ruippeixotog.scalascraper.dsl.DSL._
 
 /** 通信に関する処理を行う。 */
 object Client {
+
   /** 対象 URL のタイトルを取得する
     *
     * @param url 取得する対象の URL
@@ -18,9 +19,9 @@ object Client {
       doc >> text("title")
     } catch {
       // タイトルが取得できなかった場合はタイトルなしのまま処理を続ける
-      case _: java.net.UnknownHostException => ""
-      case _: javax.net.ssl.SSLHandshakeException => ""
-      case _: org.jsoup.HttpStatusException => ""
+      case _: java.net.UnknownHostException          => ""
+      case _: javax.net.ssl.SSLHandshakeException    => ""
+      case _: org.jsoup.HttpStatusException          => ""
       case _: org.jsoup.UnsupportedMimeTypeException => ""
     }
   }
