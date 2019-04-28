@@ -1,5 +1,6 @@
 package domain
 
+import java.net.ConnectException
 import java.time.LocalDateTime
 
 import interfaces.HatenaBookmark
@@ -64,17 +65,26 @@ object Article {
       fetchBookmarkCount: String => Int,
       threshold: Int
   ): (JudgeType, Option[Int]) = {
-    // 指定した時間分を経過した記事だけ対象にする
-    if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
-      val bookmarkCount = fetchBookmarkCount(url)
-      // 指定したブックマーク数を超えた記事だけ対象にする
-      if (bookmarkCount >= threshold) {
-        (Qualified, Some(bookmarkCount))
-      } else {
-        (NotQualified, None)
+    (
+      try {
+        Some(fetchBookmarkCount(url))
+      } catch {
+        case _: ConnectException => None
       }
-    } else {
-      (Still, None)
+    ) match {
+      case Some(bookmarkCount) =>
+        // 指定した時間分を経過した記事だけ対象にする
+        if (createdAt.isBefore(now.minusSeconds(waitSeconds))) {
+          // 指定したブックマーク数を超えた記事だけ対象にする
+          if (bookmarkCount >= threshold) {
+            (Qualified, Some(bookmarkCount))
+          } else {
+            (NotQualified, None)
+          }
+        } else {
+          (Still, None)
+        }
+      case None => (Still, None)
     }
   }
 }

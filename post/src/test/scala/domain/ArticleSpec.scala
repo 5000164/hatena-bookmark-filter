@@ -1,5 +1,6 @@
 package domain
 
+import java.net.ConnectException
 import java.time.LocalDateTime
 
 import domain.Article.judge
@@ -26,6 +27,19 @@ class ArticleSpec extends FeatureSpec {
   }
 
   feature("URL の状態に応じて結果を判定することができる") {
+    scenario("はてなブックマーク数の取得に ConnectException で失敗した場合は Still になる") {
+      assert(
+        judge(
+          url = "",
+          now = LocalDateTime.of(2018, 1, 1, 0, 0, 0),
+          createdAt = LocalDateTime.of(2017, 12, 31, 23, 59, 59),
+          waitSeconds = 1,
+          fetchBookmarkCount = _ => throw new ConnectException,
+          threshold = 0
+        ) === (Still, None)
+      )
+    }
+
     scenario("指定した時間を経過していない場合は Still になる") {
       assert(
         judge(
