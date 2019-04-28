@@ -8,13 +8,13 @@
   - common/Settings.settings に任意の内容を設定する
 - 実行ファイルを生成する
 
-```sh
+```bash
 sbt assembly
 ```
 
 - DB をセットアップする
 
-```sh
+```bash
 cd /path/to/hatena-bookmark-filter && java -jar migration/target/scala-2.12/migration.jar
 ```
 
