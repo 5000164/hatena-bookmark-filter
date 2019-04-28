@@ -12,14 +12,13 @@ object Migrate extends App {
   flyway.setLocations(s"filesystem:${System.getProperty("user.dir")}/migration/src/main/resources/db/migration")
   flyway.migrate()
 
-  SourceCodeGenerator.run(
-    profile = "slick.jdbc.H2Profile",
-    jdbcDriver = "org.h2.Driver",
-    url = url,
-    outputDir = "common/src/main/scala",
-    pkg = "infrastructure",
-    user = None,
-    password = None,
-    ignoreInvalidDefaults = true
+  SourceCodeGenerator.main(
+    Array(
+      "slick.jdbc.H2Profile",
+      "org.h2.Driver",
+      url,
+      "common/src/main/scala",
+      "infrastructure"
+    )
   )
 }
