@@ -36,7 +36,7 @@ class ArticleSpec extends FeatureSpec {
           waitSeconds = 1,
           fetchBookmarkCount = _ => throw new ConnectException,
           threshold = 0
-        ) === (Still, None)
+        ) === ((Still, None))
       )
     }
 
@@ -49,7 +49,7 @@ class ArticleSpec extends FeatureSpec {
           waitSeconds = 1,
           fetchBookmarkCount = _ => 0,
           threshold = 0
-        ) === (Still, None)
+        ) === ((Still, None))
       )
     }
 
@@ -62,7 +62,7 @@ class ArticleSpec extends FeatureSpec {
           waitSeconds = 0,
           fetchBookmarkCount = _ => 1,
           threshold = 2
-        ) === (NotQualified, None)
+        ) === ((NotQualified, None))
       )
     }
 
@@ -75,7 +75,7 @@ class ArticleSpec extends FeatureSpec {
           waitSeconds = 0,
           fetchBookmarkCount = _ => 2,
           threshold = 2
-        ) === (Qualified, Some(2))
+        ) === ((Qualified, Some(2)))
       )
     }
 
@@ -88,7 +88,7 @@ class ArticleSpec extends FeatureSpec {
           waitSeconds = 0,
           fetchBookmarkCount = _ => 3,
           threshold = 2
-        ) === (Qualified, Some(3))
+        ) === ((Qualified, Some(3)))
       )
     }
   }
