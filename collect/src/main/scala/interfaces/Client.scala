@@ -10,8 +10,12 @@ object Client {
     * @param url 取得対象の URL
     * @return 取得した内容
     */
-  def fetchContent(url: String): String = {
+  def fetchContent(url: String): Option[String] = {
     implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
-    sttp.get(uri"$url").send().body.getOrElse("")
+    try {
+      sttp.get(uri"$url").send().body.toOption
+    } catch {
+      case _: java.net.UnknownHostException => None
+    }
   }
 }
