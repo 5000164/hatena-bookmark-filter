@@ -5,7 +5,7 @@ import slick.codegen.SourceCodeGenerator
 
 /** マイグレートを実行する。 */
 object Migrate extends App {
-  val url = "jdbc:h2:./db"
+  val url = s"jdbc:h2:${System.getProperty("db", "./db")}"
 
   val flyway = Flyway
     .configure()

@@ -14,7 +14,7 @@ import scala.util.control.NonFatal
 
 /** DB に関する処理を行う。 */
 class Repository extends LazyLogging {
-  val db = Database.forURL("jdbc:h2:./db", driver = "org.h2.Driver")
+  val db = Database.forURL(s"jdbc:h2:${System.getProperty("db", "./db")}", driver = "org.h2.Driver")
 
   /** DB との接続を閉じる。
     */
