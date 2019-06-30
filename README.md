@@ -4,8 +4,8 @@
 
 - リポジトリを clone する
 - アプリケーションの設定を行う
-  - common/SettingsSample.settings をコピーして common/Settings.settings を作成する
-  - common/Settings.settings に任意の内容を設定する
+    - common/SettingsSample.settings をコピーして common/Settings.settings を作成する
+    - common/Settings.settings に任意の内容を設定する
 - 実行ファイルを生成する
 
 ```bash
