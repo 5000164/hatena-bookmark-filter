@@ -1,3 +1,7 @@
+# 2.1.0 - 30 Jun 2019
+
+- The db path can be changed
+
 # 2.0.5 - 19 May 2019
 
 - To prepare happening an error which is UnknownHostException

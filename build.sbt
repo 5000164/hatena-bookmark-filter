@@ -1,5 +1,5 @@
 name := "hatena-bookmark-filter"
-version := "2.0.5"
+version := "2.1.0"
 
 lazy val common = project
   .settings(
